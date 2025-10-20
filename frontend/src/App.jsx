@@ -7,7 +7,8 @@ import DailyNotes from './pages/DailyNotes';
 import ViewAllNotes from './pages/ViewAllNotes';
 import AddSongs from './pages/AddSongs';
 import ViewAllSongs from './pages/ViewSongs';
-
+import AddMemory from './pages/AddMemory';
+import ViewMemories from './pages/ViewMemories';
 
 const App = () => {
     return (
@@ -28,6 +29,8 @@ const App = () => {
                     <Route path="/view-all-daily-notes" element={<ViewAllNotes />} />
                     <Route path="/our-songs/addsong" element={<AddSongs />} />
                     <Route path="/our-songs/viewsongs" element={<ViewAllSongs />} />
+                    <Route path="/our-memories/add-memory" element={<AddMemory />} />
+                    <Route path="/our-memories/view-memories" element={<ViewMemories />} />
                     
                     {/* These are the other pages that will be rendered inside the <Outlet /> */}
                     {/* <Route path="favorites" element={<Favorites />} />

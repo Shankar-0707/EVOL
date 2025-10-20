@@ -1,13 +1,13 @@
 // src/components/Sidebar.jsx
 import React from 'react';
 import { Link } from 'react-router-dom'; // Use Link for navigation
-import { NotebookPen, Music, Settings, MessageSquare } from 'lucide-react'; // Icons
+import { NotebookPen, Music, Settings, Camera } from 'lucide-react'; // Icons
 
 const menuItems = [
   // path '/' is for the dashboard (Home)
   { name: 'Daily-Notes', icon: NotebookPen, path: '/daily-notes' }, 
   { name: 'Our-Songs', icon: Music, path: '/our-songs/addsong' },
-  { name: 'Messages', icon: MessageSquare, path: '/messages' },
+  { name: 'Our-Memories', icon: Camera, path: '/our-memories/add-memory' },
   { name: 'Settings', icon: Settings, path: '/settings' },
 ];
 
