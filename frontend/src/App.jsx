@@ -5,6 +5,8 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import DailyNotes from './pages/DailyNotes';
 import ViewAllNotes from './pages/ViewAllNotes';
+import AddSongs from './pages/AddSongs';
+import ViewAllSongs from './pages/ViewSongs';
 
 
 const App = () => {
@@ -24,6 +26,8 @@ const App = () => {
 
                     <Route path="/daily-notes" element={<DailyNotes />} />
                     <Route path="/view-all-daily-notes" element={<ViewAllNotes />} />
+                    <Route path="/our-songs/addsong" element={<AddSongs />} />
+                    <Route path="/our-songs/viewsongs" element={<ViewAllSongs />} />
                     
                     {/* These are the other pages that will be rendered inside the <Outlet /> */}
                     {/* <Route path="favorites" element={<Favorites />} />

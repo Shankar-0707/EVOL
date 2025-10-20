@@ -49,6 +49,7 @@ const ViewAllNotes = () => {
 
         try {
             // Use axios.delete()
+            console.log("Calling delete for:", id);
             await axios.delete(`${BASE_API_URL}/delete/${id}`); 
 
             // Remove the note from the state immediately

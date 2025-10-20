@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDb from "./config/db.js";
 import dailyNotesRoutes from "./routes/daily-routes.js";
+import oursongsRoutes from "./routes/oursongs-routes.js"
 
 
 dotenv.config();
@@ -18,5 +19,6 @@ app.use(cors({
 app.use(express.json());
 
 app.use("/daily-notes", dailyNotesRoutes);
+app.use("/our-songs",oursongsRoutes);
 
 app.listen(PORT, ()=> console.log(`Server Started on port : ${PORT}`));
