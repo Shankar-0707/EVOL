@@ -1,0 +1,42 @@
+// src/App.jsx
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard';
+import DailyNotes from './pages/DailyNotes';
+import ViewAllNotes from './pages/ViewAllNotes';
+
+
+const App = () => {
+    return (
+        // BrowserRouter must wrap everything that uses routing
+        <BrowserRouter>
+            <Routes>
+                {/* The main Route uses the Layout component as its element.
+                  This ensures the Layout (which contains the Sidebar) is always rendered.
+                */}
+                <Route path="/" element={<Layout />}>
+                    
+                    {/* index: true means this is the default page for the parent path ("/").
+                      When you first open the site (at the root URL), it shows the Dashboard.
+                    */}
+                    <Route index element={<Dashboard />} />
+
+                    <Route path="/daily-notes" element={<DailyNotes />} />
+                    <Route path="/view-all-daily-notes" element={<ViewAllNotes />} />
+                    
+                    {/* These are the other pages that will be rendered inside the <Outlet /> */}
+                    {/* <Route path="favorites" element={<Favorites />} />
+                    <Route path="messages" element={<Messages />} />
+                    <Route path="settings" element={<Settings />} /> */}
+                    
+                    {/* Optional: Add a catch-all for 404 pages */}
+                    <Route path="*" element={<div className="text-center pt-20 text-xl">404: Page Not Found</div>} />
+                
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
+};
+
+export default App;
