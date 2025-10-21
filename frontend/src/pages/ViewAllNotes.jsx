@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 // Define the URL for your backend API
 const BASE_API_URL = 'http://localhost:5000/daily-notes';
 
+
+
 const ViewAllNotes = () => {
     const navigate = useNavigate();
     

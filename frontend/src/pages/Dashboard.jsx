@@ -7,7 +7,7 @@ const Dashboard = () => {
       
       {/* General Welcome Message */}
       <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4 tracking-tight">
-        <span className="text-pink-600">Welcome Home,</span> Sweetheart!
+        <span className="text-pink-600">Welcome Home,</span> Sneha!
       </h1>
       <p className="text-lg text-gray-500 mb-8 border-b pb-4">
         This space is dedicated entirely to us.

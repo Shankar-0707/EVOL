@@ -9,6 +9,8 @@ import AddSongs from './pages/AddSongs';
 import ViewAllSongs from './pages/ViewSongs';
 import AddMemory from './pages/AddMemory';
 import ViewMemories from './pages/ViewMemories';
+import AddPhotoGallery from './pages/AddPhotoGallery';
+import ViewGallery from './pages/ViewGallery';
 
 const App = () => {
     return (
@@ -31,6 +33,8 @@ const App = () => {
                     <Route path="/our-songs/viewsongs" element={<ViewAllSongs />} />
                     <Route path="/our-memories/add-memory" element={<AddMemory />} />
                     <Route path="/our-memories/view-memories" element={<ViewMemories />} />
+                    <Route path="/our-gallery/upload-photo" element={<AddPhotoGallery />} />
+                    <Route path="/our-gallery/view-gallery" element={<ViewGallery />} />
                     
                     {/* These are the other pages that will be rendered inside the <Outlet /> */}
                     {/* <Route path="favorites" element={<Favorites />} />

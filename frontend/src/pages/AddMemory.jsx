@@ -38,7 +38,7 @@ const AddMemory = () => {
             setDate('');
             
             // Navigate to the view page after successful addition
-            navigate('/our-memories.add-memory'); 
+            navigate('/our-memories/add-memory'); 
 
         } catch (err) {
             console.error("Add Memory Error:", err);
