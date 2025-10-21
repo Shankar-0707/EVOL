@@ -11,6 +11,8 @@ import AddMemory from './pages/AddMemory';
 import ViewMemories from './pages/ViewMemories';
 import AddPhotoGallery from './pages/AddPhotoGallery';
 import ViewGallery from './pages/ViewGallery';
+import GenerateContent from './pages/GenerateContentMood';
+import ViewMoodMuse from './pages/ViewMoodMuse';
 
 const App = () => {
     return (
@@ -35,6 +37,8 @@ const App = () => {
                     <Route path="/our-memories/view-memories" element={<ViewMemories />} />
                     <Route path="/our-gallery/upload-photo" element={<AddPhotoGallery />} />
                     <Route path="/our-gallery/view-gallery" element={<ViewGallery />} />
+                    <Route path="/mood-muse/generate" element={<GenerateContent />} />
+                    <Route path="/mood-muse/view" element={<ViewMoodMuse />} />
                     
                     {/* These are the other pages that will be rendered inside the <Outlet /> */}
                     {/* <Route path="favorites" element={<Favorites />} />

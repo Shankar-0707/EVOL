@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx
 import React from 'react';
 import { Link } from 'react-router-dom'; // Use Link for navigation
-import { NotebookPen, Music, Home, Settings, Camera } from 'lucide-react'; // Icons
+import { NotebookPen,Leaf, Music, Home, Settings, Camera } from 'lucide-react'; // Icons
 
 const menuItems = [
   // path '/' is for the dashboard (Home)
@@ -10,6 +10,7 @@ const menuItems = [
   { name: 'Our-Songs', icon: Music, path: '/our-songs/addsong' },
   { name: 'Our-Memories', icon: Camera, path: '/our-memories/add-memory' },
   { name: 'Gallery', icon: Settings, path: '/our-gallery/upload-photo' },
+  { name: 'Mood-Muse', icon: Leaf, path: '/mood-muse/generate' },
 ];
 
 // activePath will be the current URL path (e.g., '/', '/favorites')
