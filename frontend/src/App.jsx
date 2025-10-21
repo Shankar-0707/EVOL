@@ -13,6 +13,8 @@ import AddPhotoGallery from './pages/AddPhotoGallery';
 import ViewGallery from './pages/ViewGallery';
 import GenerateContent from './pages/GenerateContentMood';
 import ViewMoodMuse from './pages/ViewMoodMuse';
+import GenerateQuiz from './pages/GenerateQuiz';
+import ViewQuiz from './pages/ViewQuiz';
 
 const App = () => {
     return (
@@ -39,6 +41,8 @@ const App = () => {
                     <Route path="/our-gallery/view-gallery" element={<ViewGallery />} />
                     <Route path="/mood-muse/generate" element={<GenerateContent />} />
                     <Route path="/mood-muse/view" element={<ViewMoodMuse />} />
+                    <Route path="/couple-quiz/generate" element={<GenerateQuiz />} />
+                    <Route path="/couple-quiz/view" element={<ViewQuiz />} />
                     
                     {/* These are the other pages that will be rendered inside the <Outlet /> */}
                     {/* <Route path="favorites" element={<Favorites />} />

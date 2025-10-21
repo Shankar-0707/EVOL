@@ -11,6 +11,7 @@ const menuItems = [
   { name: 'Our-Memories', icon: Camera, path: '/our-memories/add-memory' },
   { name: 'Gallery', icon: Settings, path: '/our-gallery/upload-photo' },
   { name: 'Mood-Muse', icon: Leaf, path: '/mood-muse/generate' },
+  { name: 'C-Quiz', icon: Leaf, path: '/couple-quiz/generate' },
 ];
 
 // activePath will be the current URL path (e.g., '/', '/favorites')
