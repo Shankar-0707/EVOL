@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageSquare, Loader2, Heart, Sparkles, BookOpen } from 'lucide-react'; 
 import { motion } from 'framer-motion';
 
-const BASE_API_URL = 'https://evol-server.onrender.com/mood-muse'; 
+const BASE_API_URL = 'https://evol-k431.onrender.com/mood-muse'; 
 
 const moodOptions = ['Happy', 'Thoughtful', 'Stressed', 'Romantic', 'Curious', 'Tired', 'Inspired'];
 

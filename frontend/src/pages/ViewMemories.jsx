@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Trash2, Loader2, BookMarked, CalendarDays, Heart } from 'lucide-react'; 
 import { motion, useSpring, useTransform } from 'framer-motion'; // <-- Import Framer Motion
 
-const BASE_API_URL = 'https://evol-server.onrender.com/our-memories';
+const BASE_API_URL = 'https://evol-k431.onrender.com/our-memories';
 
 const useMousePosition = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });

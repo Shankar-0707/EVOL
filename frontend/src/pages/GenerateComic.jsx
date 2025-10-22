@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageSquare, Loader2, Heart, Sparkles, BookOpen } from 'lucide-react'; 
 import { motion } from 'framer-motion';
 
-const BASE_API_URL = 'https://evol-server.onrender.com/couple-comics'; 
+const BASE_API_URL = 'https://evol-k431.onrender.com/couple-comics'; 
 
 const GenerateComic = () => {
     const navigate = useNavigate();

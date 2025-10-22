@@ -18,7 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'https://evol-our.onrender.com',
   credentials: true // if you're using cookies or HTTP authentication
 }));
 app.use(express.json());

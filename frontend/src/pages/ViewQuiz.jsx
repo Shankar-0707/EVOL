@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageSquare, Trash2, Loader2, Sparkles, HelpCircle, Heart } from 'lucide-react'; 
 import { motion, useSpring, useTransform } from 'framer-motion'; 
 
-const BASE_API_URL = 'https://evol-server.onrender.com/couple-quiz';
+const BASE_API_URL = 'https://evol-k431.onrender.com/couple-quiz';
 
 // --- CUSTOM ANIMATION COMPONENTS (Ensure these helper components are defined/imported) ---
 // For brevity, assume useMousePosition, PartnerDot, and CoupleAnimation are available

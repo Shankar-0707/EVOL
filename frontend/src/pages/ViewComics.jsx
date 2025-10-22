@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Trash2, Loader2, Sparkles, Heart, MessageSquare, BookOpen  } from 'lucide-react'; 
 import { motion, useSpring, useTransform } from 'framer-motion'; 
 
-const BASE_API_URL = 'https://evol-server.onrender.com/couple-comics';
+const BASE_API_URL = 'https://evol-k431.onrender.com/couple-comics';
 
 // --- CUSTOM ANIMATION COMPONENTS (Assume useMousePosition, CoupleAnimation are available) ---
 const useMousePosition = () => {

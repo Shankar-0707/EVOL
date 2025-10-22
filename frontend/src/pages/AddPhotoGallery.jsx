@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Camera, UploadCloud, Loader2, ListChecks } from 'lucide-react'; 
 import { motion } from 'framer-motion'; // Import Framer Motion
 
-const BASE_API_URL = 'https://evol-server.onrender.com/our-gallery'; 
+const BASE_API_URL = 'https://evol-k431.onrender.com/our-gallery'; 
 
 const AddPhoto = () => {
     const navigate = useNavigate();

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Trash2, Loader2, Sparkles, Heart, MessageSquare } from 'lucide-react'; 
 import { motion, useSpring, useTransform } from 'framer-motion'; 
 
-const BASE_API_URL = 'https://evol-server.onrender.com/mood-muse';
+const BASE_API_URL = 'https://evol-k431.onrender.com/mood-muse';
 
 // --- CUSTOM ANIMATION COMPONENTS (Reused from ViewMemories) ---
 // Note: Ensure useMousePosition, PartnerDot, and CoupleAnimation are included here
