@@ -5,7 +5,7 @@ import { ChevronLeft, Trash2, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 // Define the URL for your backend API
-const BASE_API_URL = 'http://localhost:5000/daily-notes';
+const BASE_API_URL = 'https://evol-server.onrender.com/daily-notes';
 
 
 

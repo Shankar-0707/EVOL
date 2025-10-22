@@ -6,7 +6,7 @@ import { ChevronLeft, UploadCloud , Trash2, Loader2, Heart } from 'lucide-react'
 
 import { motion, useSpring, useTransform } from 'framer-motion'; 
 
-const BASE_API_URL = 'http://localhost:5000/our-gallery';
+const BASE_API_URL = 'https://evol-server.onrender.com/our-gallery';
 
 const useMousePosition = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });

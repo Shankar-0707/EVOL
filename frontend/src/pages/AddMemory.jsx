@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Calendar, HeartHandshake, BookMarked } from 'lucide-react'; 
 
-const BASE_API_URL = 'http://localhost:5000/our-memories'; 
+const BASE_API_URL = 'https://evol-server.onrender.com/our-memories'; 
 
 const AddMemory = () => {
     const navigate = useNavigate();

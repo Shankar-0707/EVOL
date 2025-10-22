@@ -15,6 +15,8 @@ import GenerateContent from './pages/GenerateContentMood';
 import ViewMoodMuse from './pages/ViewMoodMuse';
 import GenerateQuiz from './pages/GenerateQuiz';
 import ViewQuiz from './pages/ViewQuiz';
+import GenerateComic from './pages/GenerateComic';
+import ViewComics from './pages/ViewComics';
 
 const App = () => {
     return (
@@ -43,6 +45,8 @@ const App = () => {
                     <Route path="/mood-muse/view" element={<ViewMoodMuse />} />
                     <Route path="/couple-quiz/generate" element={<GenerateQuiz />} />
                     <Route path="/couple-quiz/view" element={<ViewQuiz />} />
+                    <Route path="/couple-comics/generate" element={<GenerateComic />} />
+                    <Route path="/couple-comics/view" element={<ViewComics />} />
                     
                     {/* These are the other pages that will be rendered inside the <Outlet /> */}
                     {/* <Route path="favorites" element={<Favorites />} />

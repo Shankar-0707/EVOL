@@ -1,15 +1,13 @@
-// src/pages/ViewMoodMuse.jsx
+// src/pages/ViewComics.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Trash2, Loader2, Sparkles, Heart, MessageSquare } from 'lucide-react'; 
+import { ChevronLeft, Trash2, Loader2, Sparkles, Heart, MessageSquare, BookOpen  } from 'lucide-react'; 
 import { motion, useSpring, useTransform } from 'framer-motion'; 
 
-const BASE_API_URL = 'https://evol-server.onrender.com/mood-muse';
+const BASE_API_URL = 'https://evol-server.onrender.com/couple-comics';
 
-// --- CUSTOM ANIMATION COMPONENTS (Reused from ViewMemories) ---
-// Note: Ensure useMousePosition, PartnerDot, and CoupleAnimation are included here
-// (Or import them from a shared utility file if you have one)
+// --- CUSTOM ANIMATION COMPONENTS (Assume useMousePosition, CoupleAnimation are available) ---
 const useMousePosition = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -56,7 +54,7 @@ const PartnerDot = ({ color, initialX, delay }) => (
         }}
     />
 );
-
+ 
 const CoupleAnimation = () => {
     // 1. Use the custom mouse position hook
     const { x: mouseX, y: mouseY } = useMousePosition();
@@ -100,92 +98,79 @@ const CoupleAnimation = () => {
 };
 // -----------------------------------------------------------
 
-const ViewMoodMuse = () => {
+const ViewComics = () => {
     const navigate = useNavigate();
     
-    const [entries, setEntries] = useState([]);
+    const [comics, setComics] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const mousePosition = useMousePosition();
 
-    // --- FETCH ALL ENTRIES FUNCTION ---
-    const fetchEntries = async () => {
+    // --- FETCH ALL COMICS FUNCTION ---
+    const fetchComics = async () => {
         setIsLoading(true);
         setError(null);
         try {
             const response = await axios.get(`${BASE_API_URL}/view`);
-            setEntries(response.data.allEntries); 
+            setComics(response.data.allComics); 
         } catch (err) {
             console.error("Fetch Error:", err);
-            setError("Could not load entries. Check server and API.");
-            setEntries([]); 
+            setError("Could not load comics. Check server.");
+            setComics([]); 
         } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchEntries();
+        fetchComics();
     }, []); 
 
-    // --- DELETE ENTRY FUNCTION ---
+    // --- DELETE COMIC FUNCTION ---
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this AI-generated entry?")) {
+        if (!window.confirm("Are you sure you want to delete this comic strip?")) {
             return;
         }
 
         try {
             await axios.delete(`${BASE_API_URL}/delete/${id}`); 
-            setEntries(entries.filter(entry => entry._id !== id));
-            alert("Entry deleted successfully!");
+            setComics(comics.filter(comic => comic._id !== id));
+            alert("Comic deleted successfully!");
 
         } catch (err) {
             console.error("Delete Error:", err);
-            const errorMessage = err.response?.data?.message || "Failed to delete entry.";
+            const errorMessage = err.response?.data?.message || "Failed to delete comic.";
             alert(`Error: ${errorMessage}`);
         }
     };
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
-            month: 'long', day: 'numeric', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
+            month: 'short', day: 'numeric', year: 'numeric',
         });
     };
     
     // --- RENDERING LOGIC ---
     const renderContent = () => {
+        // ... (isLoading, error, no comics logic) ...
         if (isLoading) {
-            return (
-                <div className="text-center py-16 text-pink-500">
-                    <Loader2 size={32} className="mx-auto animate-spin mb-3" />
-                    <p className="text-lg font-medium">Summoning the muse...</p>
-                </div>
-            );
+             return (/* ... Loading JSX ... */ <div className="text-center py-16 text-red-500"><Loader2 size={32} className="mx-auto animate-spin mb-3" /><p className="text-lg font-medium">Loading comic strips...</p></div>);
         }
-
         if (error) {
-            // ... Error display
-            return (
-                <div className="text-center py-16 text-red-500 bg-red-100 p-6 rounded-xl border border-red-300">
-                    <p className="text-xl font-semibold">Error:</p>
-                    <p className="mt-2">{error}</p>
-                </div>
-            );
+            return (/* ... Error JSX ... */ <div className="text-center py-16 text-red-500 bg-red-100 p-6 rounded-xl border border-red-300"><p className="text-xl font-semibold">Error:</p><p className="mt-2">{error}</p></div>);
         }
         
-        if (entries.length === 0) {
-            // ... Empty state display
+        if (comics.length === 0) {
             return (
                 <div className="text-center py-16 text-gray-500 bg-white p-6 rounded-xl shadow-lg">
-                    <p className="text-lg">No AI entries yet! Let the muse speak.</p>
+                    <p className="text-lg">No comic strips created yet! Time to make one.</p>
                     <motion.button 
-                        onClick={() => navigate('/mood-muse/generate')}
-                        className="mt-4 px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition"
+                        onClick={() => navigate('/generate-comic')}
+                        className="mt-4 px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
                         whileHover={{ scale: 1.05 }}
                     >
-                        Generate First Entry
+                        Create First Comic
                     </motion.button>
                 </div>
             );
@@ -196,40 +181,53 @@ const ViewMoodMuse = () => {
             <>
                 <CoupleAnimation /> 
                 
-                <div className="space-y-6 max-w-4xl mx-auto">
-                    {entries.map((entry, index) => (
+                <div className="space-y-12 max-w-5xl mx-auto">
+                    {comics.map((comic, index) => (
                         <motion.div 
-                            key={entry._id} 
-                            className="bg-white p-6 rounded-2xl shadow-xl border-l-8 border-pink-500 flex flex-col hover:shadow-2xl transition duration-300"
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            key={comic._id} 
+                            className="bg-white p-6 rounded-2xl shadow-2xl border-t-8 border-red-500"
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 * index, type: "spring", stiffness: 100 }}
                         >
-                            <div className="flex justify-between items-start">
-                                <div className="mb-4">
-                                    <h2 className="text-2xl font-extrabold text-gray-800 flex items-center">
-                                        {entry.promptType} for <span className={`ml-2 px-3 py-1 rounded-full text-sm font-semibold text-white ${entry.mood === 'Romantic' ? 'bg-red-500' : 'bg-purple-500'}`}>
-                                            {entry.mood}
-                                        </span>
-                                    </h2>
-                                    <p className="text-sm text-gray-500 mt-1">Generated on: {formatDate(entry.createdAt)}</p>
+                            <div className="flex justify-between items-center mb-4 pb-2 border-b">
+                                <h2 className="text-3xl font-extrabold text-red-700 flex items-center">
+                                    <BookOpen  size={28} className="mr-3"/> {comic.comicTitle}
+                                </h2>
+                                <div>
+                                    <p className="text-xs text-gray-500">Theme: {comic.theme}</p>
+                                    <p className="text-xs text-gray-500">Created: {formatDate(comic.createdAt)}</p>
                                 </div>
-                                
+                            </div>
+                            
+                            {/* Comic Strip Panel Grid */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                                {comic.panels.map((panel, panelIndex) => (
+                                    <motion.div
+                                        key={panelIndex}
+                                        className="border-2 border-red-300 rounded-lg p-3 bg-red-50 relative overflow-hidden"
+                                        whileHover={{ scale: 1.05, boxShadow: "0 10px 15px rgba(239, 68, 68, 0.3)" }}
+                                    >
+                                        <p className="text-xs font-bold text-red-500 mb-1">PANEL {panel.panelNumber}</p>
+                                        <p className="text-xs italic text-gray-600 mb-2">Setting: {panel.setting}</p>
+                                        <p className="text-lg font-semibold text-gray-800">"{panel.dialogue}"</p>
+                                        
+                                        {/* Speech Bubble effect */}
+                                        <div className="absolute -top-3 -right-3 w-8 h-8 bg-red-400 rounded-full opacity-50"></div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                            
+                            <div className="mt-6 pt-4 border-t border-gray-100 flex justify-end">
                                 <motion.button
-                                    onClick={() => handleDelete(entry._id)}
-                                    className="text-red-500 p-2 rounded-full hover:bg-red-100 transition duration-150 flex-shrink-0"
+                                    onClick={() => handleDelete(comic._id)}
+                                    className="text-red-500 p-2 rounded-full hover:bg-red-100 transition duration-150"
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                  >
                                     <Trash2 size={20} />
                                 </motion.button>
                             </div>
-
-                            {/* AI Content Display */}
-                            <pre className="whitespace-pre-wrap text-gray-700 leading-relaxed font-serif bg-gray-50 p-4 rounded-lg border-l-2 border-pink-300">
-                                {entry.generatedContent}
-                            </pre>
-                            
                         </motion.div>
                     ))}
                 </div>
@@ -240,11 +238,11 @@ const ViewMoodMuse = () => {
     return (
         <div className="min-h-full relative overflow-hidden">
             
-            {/* Background Glow (Reused from Gallery/Memories, using Pink) */}
+            {/* Background Glow (Using Red/Pink for Comic theme) */}
             <motion.div
                 className="fixed inset-0 pointer-events-none z-0"
                 style={{
-                    background: `radial-gradient(400px at ${mousePosition.x * 20 + 50}% ${mousePosition.y * 20 + 50}%, rgba(236, 72, 153, 0.15) 0%, rgba(255, 255, 255, 0) 100%)`,
+                    background: `radial-gradient(400px at ${mousePosition.x * 20 + 50}% ${mousePosition.y * 20 + 50}%, rgba(239, 68, 68, 0.2) 0%, rgba(255, 255, 255, 0) 100%)`,
                     transition: 'background 0.3s ease-out', 
                 }}
             />
@@ -253,7 +251,7 @@ const ViewMoodMuse = () => {
                 {/* Header and Control Buttons */}
                 <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200 bg-gray-50/90 backdrop-blur-sm sticky top-0 z-20">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 tracking-tight">
-                        <span className="text-purple-600">Mood</span> Muse
+                        <span className="text-red-600">Couple</span> Comics
                     </h1>
 
                     <div className="flex space-x-3">
@@ -266,17 +264,17 @@ const ViewMoodMuse = () => {
                             disabled={isLoading}
                         >
                             <ChevronLeft size={20} className="mr-1" />
-                            DashBoard
+                            Dashboard
                         </motion.button>
                         {/* Back to Generate Button */}
                         <motion.button 
-                            onClick={() => navigate('/mood-muse/generate')}
-                            className="flex items-center px-4 py-2 bg-pink-500 text-white rounded-full font-medium hover:bg-pink-600 transition duration-150 shadow-md"
+                            onClick={() => navigate('/couple-comics/generate')}
+                            className="flex items-center px-4 py-2 bg-red-500 text-white rounded-full font-medium hover:bg-red-600 transition duration-150 shadow-md"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             disabled={isLoading}
                         >
-                            <MessageSquare size={20} className="mr-1" />
+                            <Sparkles size={20} className="mr-1" />
                             Generate New
                         </motion.button>
                     </div>
@@ -290,4 +288,4 @@ const ViewMoodMuse = () => {
     );
 };
 
-export default ViewMoodMuse;
+export default ViewComics;

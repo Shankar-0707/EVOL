@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { ChevronLeft, ListChecks, Search, Music, Disc } from 'lucide-react'; 
 
-const BASE_API_URL = 'http://localhost:5000/our-songs'; 
+const BASE_API_URL = 'https://evol-server.onrender.com/our-songs'; 
 
 const AddSongs = () => {
     const navigate = useNavigate();

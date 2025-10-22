@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageSquare, Loader2, Heart, Sparkles, BookOpen, Send } from 'lucide-react'; 
 import { motion } from 'framer-motion';
 
-const BASE_API_URL = 'http://localhost:5000/couple-quiz'; 
+const BASE_API_URL = 'https://evol-server.onrender.com/couple-quiz'; 
 
 const categoryOptions = [
     'Favorite Memories', 

@@ -8,6 +8,7 @@ import memoryRoutes from "./routes/memories-routes.js"
 import galleryRoutes from "./routes/gallery-routes.js"
 import moodMuseRoutes from "./routes/moodmuse-routes.js";
 import coupleQuizRoutes from "./routes/couplequiz-routes.js"
+import coupleComicRoutes from "./routes/couplecomic-routes.js";
 
 
 dotenv.config();
@@ -28,5 +29,6 @@ app.use('/our-memories', memoryRoutes);
 app.use('/our-gallery', galleryRoutes);
 app.use('/mood-muse', moodMuseRoutes);
 app.use('/couple-quiz', coupleQuizRoutes);
+app.use('/couple-comics', coupleComicRoutes);
 
 app.listen(PORT, ()=> console.log(`Server Started on port : ${PORT}`));

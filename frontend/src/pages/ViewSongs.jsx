@@ -4,7 +4,7 @@ import axios from "axios";
 import { ChevronLeft, Trash2, Loader2, Music, Disc } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const BASE_API_URL = "http://localhost:5000/our-songs";
+const BASE_API_URL = "https://evol-server.onrender.com/our-songs";
 
 const ViewAllSongs = () => {
   const navigate = useNavigate();
