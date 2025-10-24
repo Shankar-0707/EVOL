@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ChevronLeft, Trash2, Loader2, Music, Disc } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 
 const BASE_API_URL = "https://evol-k431.onrender.com/our-songs";
 
@@ -67,12 +69,17 @@ const ViewAllSongs = () => {
 
       // Update state: remove the deleted song immediately from the UI
       setSongs(songs.filter((song) => song.spotifyId !== spotifyId));
-      alert("Song deleted successfully! 🗑️");
+      toast.success("Song deleted successfully! 🗑️", {
+        iconTheme: {
+          primary: "#ec4899", // pink-500 color
+          secondary: "#fff", // icon ke andar ka color
+        },
+      });
     } catch (err) {
       console.error("Delete Error:", err);
       const errorMessage =
         err.response?.data?.message || "Failed to delete song.";
-      alert(`Error: ${errorMessage}`);
+      toast.error(`Error: ${errorMessage}`);
     }
   };
 
