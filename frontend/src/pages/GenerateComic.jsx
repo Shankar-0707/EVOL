@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageSquare, Loader2, Heart, Sparkles, BookOpen } from 'lucide-react'; 
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const BASE_API_URL = 'https://evol-k431.onrender.com/couple-comics'; 
 
@@ -27,7 +28,7 @@ const GenerateComic = () => {
             
             await axios.post(`${BASE_API_URL}/generate`, payload);
             
-            alert(`Comic strip generated and saved successfully!`);
+            toast.success(`Comic strip generated and saved successfully!`);
             
             setTheme('');
             
@@ -37,7 +38,7 @@ const GenerateComic = () => {
         } catch (err) {
             console.error("AI Generation Error:", err);
             const message = err.response?.data?.message || "Failed to generate comic. Check Gemini API key.";
-            alert(`Generation Failed: ${message}`);
+            toast.error(`Generation Failed: ${message}`);
         } finally {
             setIsLoading(false);
         }

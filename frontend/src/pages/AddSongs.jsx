@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { ChevronLeft, ListChecks, Search, Music, Disc } from 'lucide-react'; 
+import toast from 'react-hot-toast';
 
 const BASE_API_URL = 'https://evol-k431.onrender.com/our-songs'; 
 
@@ -51,7 +52,7 @@ const AddSongs = () => {
     // --- ADD SONG TO MONGODB HANDLER ---
     const handleAddSong = async (songData) => {
         if (!addedBy.trim()) {
-            alert("Please enter who is adding the song.");
+            toast("Please enter who is adding the song.");
             return;
         }
 
@@ -63,7 +64,7 @@ const AddSongs = () => {
             
             await axios.post(`${BASE_API_URL}/addsong`, payload);
             
-            alert(`"${songData.title}" by ${songData.artist} added successfully! 💖`);
+            toast.success(`"${songData.title}" by ${songData.artist} added successfully! 💖`);
 
             setSearchTerm('');
             setArtistTerm('');
@@ -77,7 +78,7 @@ const AddSongs = () => {
         } catch (err) {
             console.error("Add Song Error:", err);
             const message = err.response?.data?.message || "Failed to add song.";
-            alert(`Error: ${message}`);
+            toast.error(`Error: ${message}`);
         }
     };
 

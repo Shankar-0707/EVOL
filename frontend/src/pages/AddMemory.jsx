@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Calendar, HeartHandshake, BookMarked } from 'lucide-react'; 
+import toast from 'react-hot-toast';
 
 const BASE_API_URL = 'https://evol-k431.onrender.com/our-memories'; 
 
@@ -30,7 +31,7 @@ const AddMemory = () => {
             
             await axios.post(`${BASE_API_URL}/add-memory`, payload);
             
-            alert(`Memory "${title}" saved successfully!`);
+            toast.success(`Memory "${title}" saved successfully!`);
             
             // Clear form and navigate
             setTitle('');
@@ -43,7 +44,7 @@ const AddMemory = () => {
         } catch (err) {
             console.error("Add Memory Error:", err);
             const message = err.response?.data?.message || "Failed to save memory.";
-            alert(`Error: ${message}`);
+            toast.error(`Error: ${message}`);
         } finally {
             setIsLoading(false);
         }

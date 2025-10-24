@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageSquare, Loader2, Heart, Sparkles, BookOpen, Send } from 'lucide-react'; 
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const BASE_API_URL = 'https://evol-k431.onrender.com/couple-quiz'; 
 
@@ -50,7 +51,7 @@ const GenerateQuiz = () => {
         } catch (err) {
             console.error("AI Generation Error:", err);
             const message = err.response?.data?.message || "Failed to generate question.";
-            alert(`Generation Failed: ${message}`);
+            toast.error(`Generation Failed: ${message}`);
         } finally {
             setIsLoading(false);
         }

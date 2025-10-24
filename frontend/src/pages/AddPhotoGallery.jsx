@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Camera, UploadCloud, Loader2, ListChecks } from 'lucide-react'; 
 import { motion } from 'framer-motion'; // Import Framer Motion
+import toast from 'react-hot-toast';
 
 const BASE_API_URL = 'https://evol-k431.onrender.com/our-gallery'; 
 
@@ -46,7 +47,7 @@ const AddPhoto = () => {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
-            alert(`Photo uploaded and saved to MongoDB successfully! 📸`);
+            toast.success(`Photo uploaded and saved to MongoDB successfully! 📸`);
             
             setFile(null); setCaption(''); setPreviewUrl(null);
             
@@ -55,7 +56,7 @@ const AddPhoto = () => {
         } catch (err) {
             console.error("Upload Error:", err);
             const message = err.response?.data?.message || "Failed to upload photo.";
-            alert(`Upload Failed: ${message}`);
+            toast.error(`Upload Failed: ${message}`);
         } finally {
             setIsLoading(false);
         }

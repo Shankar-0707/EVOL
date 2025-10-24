@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ListChecks } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 // Define the URL for your backend API
 const API_URL = 'https://evol-k431.onrender.com/daily-notes/add'; 
@@ -47,7 +48,7 @@ const DailyNotes = () => {
             }
 
             // 4. Show success alert
-            alert("Note added successfully! 🎉");
+            toast.success("Note Added Successfully");
 
             // 5. Clear the form 
             setTitle('');
@@ -58,7 +59,7 @@ const DailyNotes = () => {
             
         } catch (error) {
             console.error('Error adding note:', error.message);
-            alert(`Failed to add note: ${error.message}`);
+            toast.error(`Failed to add note: ${error.message}`);
         } finally {
             setIsLoading(false); 
         }

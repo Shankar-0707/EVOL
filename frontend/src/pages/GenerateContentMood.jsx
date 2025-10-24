@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageSquare, Loader2, Heart, Sparkles, BookOpen } from 'lucide-react'; 
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const BASE_API_URL = 'https://evol-k431.onrender.com/mood-muse'; 
 
@@ -26,7 +27,7 @@ const GenerateContent = () => {
             
             const response = await axios.post(`${BASE_API_URL}/generate`, payload);
             
-            alert(`AI generated a beautiful ${promptType}! Saved successfully!`);
+            toast.success(`AI generated a beautiful ${promptType}! Saved successfully!`);
             
             // Navigate to the view page after successful generation and save
             navigate('/mood-muse/view'); 
@@ -34,7 +35,7 @@ const GenerateContent = () => {
         } catch (err) {
             console.error("AI Generation Error:", err);
             const message = err.response?.data?.message || "Failed to generate content. Check your Gemini API key.";
-            alert(`Generation Failed: ${message}`);
+            toast.error(`Generation Failed: ${message}`);
         } finally {
             setIsLoading(false);
         }

@@ -18,6 +18,7 @@ import ViewQuiz from './pages/ViewQuiz';
 import GenerateComic from './pages/GenerateComic';
 import ViewComics from './pages/ViewComics';
 
+
 const App = () => {
     return (
         // BrowserRouter must wrap everything that uses routing
