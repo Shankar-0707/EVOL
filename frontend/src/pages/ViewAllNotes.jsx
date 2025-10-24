@@ -1,7 +1,7 @@
 // src/pages/ViewAllNotes.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios"; // Import Axios
-import { ChevronLeft, Trash2, Loader2 } from "lucide-react";
+import { ChevronLeft, Trash2, Loader2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import API from "../utils/api";
@@ -17,6 +17,8 @@ const ViewAllNotes = () => {
   const [notes, setNotes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   // --- 🚨 AXIOS FETCH FUNCTION 🚨 ---
   const fetchNotes = async () => {
@@ -44,6 +46,25 @@ const ViewAllNotes = () => {
   useEffect(() => {
     fetchNotes();
   }, []);
+
+  // Handle ESC key to close popup
+  useEffect(() => {
+    const handleEscKey = (event) => {
+      if (event.key === 'Escape' && isPopupOpen) {
+        closeNotePopup();
+      }
+    };
+
+    if (isPopupOpen) {
+      document.addEventListener('keydown', handleEscKey);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isPopupOpen]);
 
   // --- AXIOS DELETE FUNCTION ---
   const handleDelete = async (id) => {
@@ -83,6 +104,17 @@ const ViewAllNotes = () => {
     });
   };
 
+  // --- Popup functions ---
+  const openNotePopup = (note) => {
+    setSelectedNote(note);
+    setIsPopupOpen(true);
+  };
+
+  const closeNotePopup = () => {
+    setSelectedNote(null);
+    setIsPopupOpen(false);
+  };
+
   // --- RENDERING LOGIC (same as before) ---
   let content;
 
@@ -118,7 +150,8 @@ const ViewAllNotes = () => {
         {notes.map((note) => (
           <div
             key={note._id}
-            className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-pink-400 flex flex-col hover:shadow-xl transition duration-300"
+            className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-pink-400 flex flex-col hover:shadow-xl transition duration-300 cursor-pointer"
+            onClick={() => openNotePopup(note)}
           >
             <h3 className="text-xl font-bold text-gray-800 mb-2">
               {note.title}
@@ -139,7 +172,10 @@ const ViewAllNotes = () => {
             {/* Delete Button */}
             <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
               <button
-                onClick={() => handleDelete(note._id)}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent popup from opening when clicking delete
+                  handleDelete(note._id);
+                }}
                 className="text-red-500 p-2 rounded-full hover:bg-red-100 transition duration-150"
                 aria-label={`Delete note titled ${note.title}`}
               >
@@ -175,6 +211,64 @@ const ViewAllNotes = () => {
 
       {/* Notes Grid Content */}
       {content}
+
+      {/* Note Popup Modal */}
+      {isPopupOpen && selectedNote && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={closeNotePopup}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Popup Header */}
+            <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-pink-50 to-purple-50">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                  {selectedNote.title}
+                </h2>
+                <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <span className="font-medium">
+                    By: <span className="text-pink-600 font-semibold">{selectedNote.madeby}</span>
+                  </span>
+                  <span>•</span>
+                  <span>{formatDate(selectedNote.createdAt)}</span>
+                </div>
+              </div>
+              <button
+                onClick={closeNotePopup}
+                className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition duration-150"
+                aria-label="Close popup"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Popup Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <div className="prose prose-lg max-w-none">
+                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {selectedNote.content}
+                </div>
+              </div>
+            </div>
+
+            {/* Popup Footer */}
+            <div className="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => {
+                  handleDelete(selectedNote._id);
+                  closeNotePopup();
+                }}
+                className="text-red-500 hover:text-red-700 px-4 py-2 rounded-lg hover:bg-red-50 transition duration-150 font-medium"
+              >
+                Delete Note
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

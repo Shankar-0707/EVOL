@@ -15,7 +15,16 @@ const categoryOptions = [
     'Daily Habits', 
     'Preferences & Hobbies', 
     'Inside Jokes',
-    'Date Nights'
+    'Date Nights',
+    'Childhood Stories',
+    'Food & Cooking',
+    'Travel Dreams',
+    'Pet Peeves',
+    'Celebration Traditions',
+    'Music & Movies',
+    'Communication Style',
+    'Love Languages',
+    'Bucket List Items'
 ];
 
 const GenerateQuiz = () => {
