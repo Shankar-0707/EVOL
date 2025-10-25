@@ -130,7 +130,7 @@ const ViewAllNotes = () => {
             <p className="text-sm text-pink-500 mb-4">
               {formatDate(note.createdAt)}
             </p>
-            <p className="text-gray-700 leading-relaxed flex-grow">
+            <p className="text-gray-700 leading-relaxed flex-grow overflow-y-auto">
               {note.content}
             </p>
 
