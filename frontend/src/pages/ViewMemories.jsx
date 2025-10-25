@@ -264,7 +264,7 @@ const ViewMemories = () => {
                   {formatDate(memory.date)}
                 </p>
 
-                <p className="flex-grow text-gray-700 mb-4 border-l-4 border-purple-200 pl-3 italic">
+                <p className="flex-grow text-gray-700 mb-4 border-l-4 border-purple-200 pl-3 italic overflow-auto overflow-y-auto">
                   "{memory.description}"
                 </p>
 

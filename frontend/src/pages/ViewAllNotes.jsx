@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 
 // Define the URL for your backend API
 const BASE_API_URL = "https://evol-k431.onrender.com/daily-notes";
+// const BASE_API_URL = "http://localhost:5000/daily-notes";
 
 const ViewAllNotes = () => {
   const navigate = useNavigate();
@@ -129,7 +130,7 @@ const ViewAllNotes = () => {
             <p className="text-sm text-pink-500 mb-4">
               {formatDate(note.createdAt)}
             </p>
-            <p className="text-gray-700 leading-relaxed line-clamp-4 flex-grow">
+            <p className="text-gray-700 leading-relaxed flex-grow">
               {note.content}
             </p>
 
