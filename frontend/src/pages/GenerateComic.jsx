@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../utils/api";
 import {
   ChevronLeft,
   MessageSquare,
@@ -13,7 +14,7 @@ import {
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
-const BASE_API_URL = "https://evol-k431.onrender.com/couple-comics";
+// const BASE_API_URL = "https://evol-k431.onrender.com/couple-comics";
 
 const GenerateComic = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const GenerateComic = () => {
     try {
       const payload = { theme: theme.trim() };
 
-      await axios.post(`${BASE_API_URL}/generate`, payload);
+      await API.post(`/couple-comics/generate`, payload);
 
       toast.success(`Comic strip generated and saved successfully!`, {
         iconTheme: {

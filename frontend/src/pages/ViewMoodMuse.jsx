@@ -12,9 +12,11 @@ import {
 } from "lucide-react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
+import API from "../utils/api";
 
 
-const BASE_API_URL = "https://evol-k431.onrender.com/mood-muse";
+
+// const BASE_API_URL = "https://evol-k431.onrender.com/mood-muse";
 
 // --- CUSTOM ANIMATION COMPONENTS (Reused from ViewMemories) ---
 // Note: Ensure useMousePosition, PartnerDot, and CoupleAnimation are included here
@@ -130,7 +132,7 @@ const ViewMoodMuse = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${BASE_API_URL}/view`);
+      const response = await API.get(`/mood-muse/view`);
       setEntries(response.data.allEntries);
     } catch (err) {
       console.error("Fetch Error:", err);
@@ -156,7 +158,7 @@ const ViewMoodMuse = () => {
     }
 
     try {
-      await axios.delete(`${BASE_API_URL}/delete/${id}`);
+      await API.delete(`/mood-muse/delete/${id}`);
       setEntries(entries.filter((entry) => entry._id !== id));
       toast.success("Entry deleted successfully!", {
         iconTheme: {

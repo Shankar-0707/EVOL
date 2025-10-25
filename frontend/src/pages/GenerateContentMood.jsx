@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../utils/api";
 import {
   ChevronLeft,
   MessageSquare,
@@ -13,7 +14,7 @@ import {
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
-const BASE_API_URL = "https://evol-k431.onrender.com/mood-muse";
+// const BASE_API_URL = "https://evol-k431.onrender.com/mood-muse";
 
 const moodOptions = [
   "Happy",
@@ -40,7 +41,7 @@ const GenerateContent = () => {
     try {
       const payload = { mood, promptType };
 
-      const response = await axios.post(`${BASE_API_URL}/generate`, payload);
+      const response = await API.post(`/mood-muse/generate`, payload);
 
       toast.success(
         `AI generated a beautiful ${promptType}! Saved successfully!`,

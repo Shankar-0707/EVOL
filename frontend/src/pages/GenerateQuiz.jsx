@@ -5,8 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageSquare, Loader2, Heart, Sparkles, BookOpen, Send } from 'lucide-react'; 
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import API from "../utils/api";
 
-const BASE_API_URL = 'https://evol-k431.onrender.com/couple-quiz'; 
+// const BASE_API_URL = 'https://evol-k431.onrender.com/couple-quiz'; 
 
 const categoryOptions = [
     'Favorite Memories', 
@@ -42,7 +43,7 @@ const GenerateQuiz = () => {
             const payload = { category };
             
             // 1. Call backend to get ONLY the question text
-            const response = await axios.post(`${BASE_API_URL}/generate`, payload);
+            const response = await API.post(`/couple-quiz/generate`, payload);
             
             // 2. Store the question, moving the user to the answer input stage
             setCurrentQuestion(response.data.question);
@@ -75,7 +76,7 @@ const GenerateQuiz = () => {
             };
             
             // 1. Call backend to save the full entry
-            await axios.post(`${BASE_API_URL}/save-answer`, payload);
+            await API.post(`/save-answer`, payload);
             
             alert(`Question & Answer saved! Ready for the next one!`);
             

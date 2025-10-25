@@ -9,8 +9,10 @@ import {
   BookMarked,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import API from '../utils/api';
 
-const BASE_API_URL = "https://evol-k431.onrender.com/our-memories";
+// const BASE_API_URL = "https://evol-k431.onrender.com/our-memories";
+const BASE_API_URL = API.baseURL;
 
 const AddMemory = () => {
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ const AddMemory = () => {
         addedBy: addedBy.trim(),
       };
 
-      await axios.post(`${BASE_API_URL}/add-memory`, payload);
+      await API.post(`/our-memories/add-memory`, payload);
 
       toast.success(`Memory "${title}" saved successfully!`, {
         iconTheme: {

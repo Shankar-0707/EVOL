@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import { ChevronLeft, ListChecks } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import API from "../utils/api";
 
 // Define the URL for your backend API
-const API_URL = "https://evol-k431.onrender.com/daily-notes/add";
+// const API_URL = "https://evol-k431.onrender.com/daily-notes/add";
 
 const DailyNotes = () => {
   const [title, setTitle] = useState("");
@@ -36,18 +37,11 @@ const DailyNotes = () => {
     };
 
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newNoteData),
-      });
+      const response = await API.post("/daily-notes/add", newNoteData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (response.status !== 200 && response.status !== 201) {
         throw new Error(
-          errorData.message || `Failed with status: ${response.status}`
+          response.data?.message || `Failed with status: ${response.status}`
         );
       }
 

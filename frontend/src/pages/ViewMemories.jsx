@@ -12,9 +12,11 @@ import {
 } from "lucide-react";
 import { motion, useSpring, useTransform } from "framer-motion"; // <-- Import Framer Motion
 import toast from "react-hot-toast";
+import API from "../utils/api";
 
 
-const BASE_API_URL = "https://evol-k431.onrender.com/our-memories";
+
+// const BASE_API_URL = "https://evol-k431.onrender.com/our-memories";
 
 const useMousePosition = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -128,7 +130,7 @@ const ViewMemories = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${BASE_API_URL}/view-memories`);
+      const response = await API.get(`/our-memories/view-memories`);
       setMemories(response.data.allMemories);
     } catch (err) {
       console.error("Fetch Error:", err);
@@ -152,7 +154,7 @@ const ViewMemories = () => {
     }
 
     try {
-      await axios.delete(`${BASE_API_URL}/delete-memory/${id}`);
+      await API.delete(`/our-memories/delete-memory/${id}`);
       setMemories(memories.filter((memory) => memory._id !== id));
       toast.success("Memory deleted successfully! 💔", {
         iconTheme: {
@@ -264,9 +266,9 @@ const ViewMemories = () => {
                   {formatDate(memory.date)}
                 </p>
 
-                <p className="flex-grow text-gray-700 mb-4 border-l-4 border-purple-200 pl-3 italic overflow-y-auto">
+                <div className="flex-grow text-gray-700 mb-4 border-l-4 border-purple-200 max-h-32 pl-3 italic overflow-y-auto">
                   "{memory.description}"
-                </p>
+                </div>
 
                 <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
                   <p className="text-xs text-gray-500">

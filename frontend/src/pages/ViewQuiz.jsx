@@ -13,9 +13,11 @@ import {
 } from "lucide-react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
+import API from "../utils/api";
 
 
-const BASE_API_URL = "https://evol-k431.onrender.com/couple-quiz";
+
+// const BASE_API_URL = "https://evol-k431.onrender.com/couple-quiz";
 
 // --- CUSTOM ANIMATION COMPONENTS (Ensure these helper components are defined/imported) ---
 // For brevity, assume useMousePosition, PartnerDot, and CoupleAnimation are available
@@ -131,7 +133,7 @@ const ViewQuiz = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${BASE_API_URL}/view`);
+      const response = await API.get(`/couple-quiz/view`);
       setQuestions(response.data.allQuestions);
     } catch (err) {
       console.error("Fetch Error:", err);
@@ -155,7 +157,7 @@ const ViewQuiz = () => {
     }
 
     try {
-      await axios.delete(`${BASE_API_URL}/delete/${id}`);
+      await API.delete(`/couple-quiz/delete/${id}`);
       setQuestions(questions.filter((q) => q._id !== id));
       toast.success("Question deleted successfully!", {
         iconTheme: {

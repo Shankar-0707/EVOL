@@ -3,10 +3,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ChevronLeft, Trash2, Loader2, Music, Disc } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import API from "../utils/api";
+
 import toast from "react-hot-toast";
 
 
-const BASE_API_URL = "https://evol-k431.onrender.com/our-songs";
+// const BASE_API_URL = "https://evol-k431.onrender.com/our-songs";
 
 const ViewAllSongs = () => {
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ const ViewAllSongs = () => {
     setError(null);
     try {
       // GET request to /our-songs/view
-      const response = await axios.get(`${BASE_API_URL}/viewsongs`);
+      const response = await API.get(`/our-songs/viewsongs`);
 
       // Assuming the backend returns { allSongs: [...] }
       setSongs(response.data.allSongs);
@@ -65,7 +67,7 @@ const ViewAllSongs = () => {
 
     try {
       // DELETE request to /our-songs/delete/:id
-      await axios.delete(`${BASE_API_URL}/delete/${spotifyId}`);
+      await API.delete(`/our-songs/delete/${spotifyId}`);
 
       // Update state: remove the deleted song immediately from the UI
       setSongs(songs.filter((song) => song.spotifyId !== spotifyId));

@@ -13,8 +13,10 @@ import {
 } from "lucide-react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
+import API from "../utils/api";
 
-const BASE_API_URL = "https://evol-k431.onrender.com/couple-comics";
+
+// const BASE_API_URL = "https://evol-k431.onrender.com/couple-comics";
 
 // --- CUSTOM ANIMATION COMPONENTS (Assume useMousePosition, CoupleAnimation are available) ---
 const useMousePosition = () => {
@@ -128,7 +130,7 @@ const ViewComics = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${BASE_API_URL}/view`);
+      const response = await API.get(`/couple-comics/view`);
       setComics(response.data.allComics);
     } catch (err) {
       console.error("Fetch Error:", err);
@@ -150,7 +152,7 @@ const ViewComics = () => {
     }
 
     try {
-      await axios.delete(`${BASE_API_URL}/delete/${id}`);
+      await API.delete(`/couple-comics/delete/${id}`);
       setComics(comics.filter((comic) => comic._id !== id));
       toast.success("Comic deleted successfully!", {
         iconTheme: {

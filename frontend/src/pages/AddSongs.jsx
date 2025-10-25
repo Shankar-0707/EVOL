@@ -5,8 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { ChevronLeft, ListChecks, Search, Music, Disc } from "lucide-react";
 import toast from "react-hot-toast";
+import API from "../utils/api";
 
-const BASE_API_URL = "https://evol-k431.onrender.com/our-songs";
+// const BASE_API_URL = "https://evol-k431.onrender.com/our-songs";
 
 const AddSongs = () => {
   const navigate = useNavigate();
@@ -31,8 +32,8 @@ const AddSongs = () => {
     setSearchResults([]);
 
     try {
-      const url = `${BASE_API_URL}/search`;
-      const response = await axios.get(url, {
+      const url = `/our-songs/search`;
+      const response = await API.get(url, {
         params: {
           query: searchTerm.trim(),
           artist: artistTerm.trim(),
@@ -63,7 +64,7 @@ const AddSongs = () => {
         addedBy: addedBy.trim(),
       };
 
-      await axios.post(`${BASE_API_URL}/addsong`, payload);
+      await API.post(`/our-songs/addsong`, payload);
 
       toast.success(
         `"${songData.title}" by ${songData.artist} added successfully! 💖`,

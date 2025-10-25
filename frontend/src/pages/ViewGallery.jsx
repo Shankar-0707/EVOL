@@ -4,11 +4,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, UploadCloud, Trash2, Loader2, Heart } from "lucide-react";
 import toast from "react-hot-toast";
+import API from "../utils/api";
+
 
 
 import { motion, useSpring, useTransform } from "framer-motion";
 
-const BASE_API_URL = "https://evol-k431.onrender.com/our-gallery";
+// const BASE_API_URL = "https://evol-k431.onrender.com/our-gallery";
 
 const useMousePosition = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -120,7 +122,7 @@ const ViewGallery = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${BASE_API_URL}/view-gallery`);
+      const response = await API.get(`/our-gallery/view-gallery`);
       // response.data.allPhotos now contains the Base64 image URL
       setPhotos(response.data.allPhotos);
     } catch (err) {
@@ -146,7 +148,7 @@ const ViewGallery = () => {
 
     try {
       // Delete request uses MongoDB's _id
-      await axios.delete(`${BASE_API_URL}/delete-photo/${id}`);
+      await API.delete(`/our-gallery/delete-photo/${id}`);
       setPhotos(photos.filter((photo) => photo._id !== id));
       toast.success("Photo deleted successfully!", {
         iconTheme: {
@@ -298,9 +300,9 @@ const ViewGallery = () => {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent p-4 flex flex-col justify-end">
-                    <p className="text-white text-lg font-semibold line-clamp-2">
+                    <div className="text-white text-lg font-semibold overflow-y-auto max-h-32">
                       {photo.caption}
-                    </p>
+                    </div>
                   </div>
                 </div>
 

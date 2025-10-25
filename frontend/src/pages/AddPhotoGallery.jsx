@@ -11,8 +11,9 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion"; // Import Framer Motion
 import toast from "react-hot-toast";
+import API from "../utils/api";
 
-const BASE_API_URL = "https://evol-k431.onrender.com/our-gallery";
+// const BASE_API_URL = "https://evol-k431.onrender.com/our-gallery";
 
 const AddPhoto = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const AddPhoto = () => {
     formData.append("uploadedBy", uploadedBy.trim());
 
     try {
-      await axios.post(`${BASE_API_URL}/upload-photo`, formData, {
+      await API.post(`/our-gallery/upload-photo`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

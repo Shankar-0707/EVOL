@@ -4,9 +4,11 @@ import axios from "axios"; // Import Axios
 import { ChevronLeft, Trash2, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import API from "../utils/api";
+
 
 // Define the URL for your backend API
-const BASE_API_URL = "https://evol-k431.onrender.com/daily-notes";
+// const BASE_API_URL = "https://evol-k431.onrender.com/daily-notes";
 // const BASE_API_URL = "http://localhost:5000/daily-notes";
 
 const ViewAllNotes = () => {
@@ -22,7 +24,7 @@ const ViewAllNotes = () => {
     setError(null);
     try {
       // Use axios.get()
-      const response = await axios.get(`${BASE_API_URL}/view`);
+      const response = await API.get(`/daily-notes/view`);
 
       // Axios automatically handles JSON parsing and throws an error for 4xx/5xx status codes.
       // Assuming your backend returns data in response.data.allNotes (based on your controller)
@@ -52,7 +54,7 @@ const ViewAllNotes = () => {
     try {
       // Use axios.delete()
       console.log("Calling delete for:", id);
-      await axios.delete(`${BASE_API_URL}/delete/${id}`);
+      await API.delete(`/daily-notes/delete/${id}`);
 
       // Remove the note from the state immediately
       setNotes(notes.filter((note) => note._id !== id));
@@ -130,9 +132,9 @@ const ViewAllNotes = () => {
             <p className="text-sm text-pink-500 mb-4">
               {formatDate(note.createdAt)}
             </p>
-            <p className="text-gray-700 leading-relaxed flex-grow overflow-y-auto">
-              {note.content}
-            </p>
+           <div className="text-gray-700 leading-relaxed max-h-32 overflow-y-auto pr-2 mb-4 flex-grow">
+             {note.content}
+           </div>
 
             {/* Delete Button */}
             <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
