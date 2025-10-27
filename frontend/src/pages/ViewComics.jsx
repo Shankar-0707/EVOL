@@ -15,7 +15,6 @@ import { motion, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
 import API from "../utils/api";
 
-
 // const BASE_API_URL = "https://evol-k431.onrender.com/couple-comics";
 
 // --- CUSTOM ANIMATION COMPONENTS (Assume useMousePosition, CoupleAnimation are available) ---
@@ -329,6 +328,18 @@ const ViewComics = () => {
             >
               <Sparkles size={20} className="mr-1" />
               Generate New
+            </motion.button>
+
+            {/* --- NEW BUTTON: VIEW DELETED COMICS --- */}
+            <motion.button
+              onClick={() => navigate("/couple-comics/view-all-deleted-comics")} // <-- NEW ROUTE
+              className="flex items-center px-4 py-2 rounded-full font-medium transition duration-150 shadow-lg bg-gray-500 text-white hover:bg-gray-600"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isLoading}
+            >
+              <Trash2 size={20} className="mr-1" />
+              Deleted Comics
             </motion.button>
           </div>
         </header>

@@ -17,6 +17,8 @@ import GenerateQuiz from './pages/GenerateQuiz';
 import ViewQuiz from './pages/ViewQuiz';
 import GenerateComic from './pages/GenerateComic';
 import ViewComics from './pages/ViewComics';
+import ViewDeletedComics from './pages/ViewDeletedComics';
+import ViewDeletedNotes from './pages/ViewDeletedNotes';
 
 
 const App = () => {
@@ -48,6 +50,8 @@ const App = () => {
                     <Route path="/couple-quiz/view" element={<ViewQuiz />} />
                     <Route path="/couple-comics/generate" element={<GenerateComic />} />
                     <Route path="/couple-comics/view" element={<ViewComics />} />
+                    <Route path="/couple-comics/view-all-deleted-comics" element={<ViewDeletedComics />} />
+                    <Route path="/daily-notes/view-all-deleted-notes" element={<ViewDeletedNotes />} />
                     
                     {/* These are the other pages that will be rendered inside the <Outlet /> */}
                     {/* <Route path="favorites" element={<Favorites />} />

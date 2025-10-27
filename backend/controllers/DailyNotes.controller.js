@@ -1,4 +1,5 @@
 import DailyNoteModel from "../models/DailyNote.model.js";
+import DeletedNoteModel from "../models/DeletedNote.model.js";
 
 const add = async (req, res) => {
     try{
@@ -52,31 +53,63 @@ const view = async (req, res) => {
     }
 }
 
-const del = async (req, res) => {
+const deleteNote = async (req, res) => {
     try{
-        const daily_note_id = req.params.id;
-        console.log(`Attempting to delete note with ID: ${daily_note_id}`);
-        const deletedNote = await DailyNoteModel.findByIdAndDelete(daily_note_id);
+        const id = req.params.id;
+        
+        // 1. Find the original note
+        const noteToArchive = await DailyNoteModel.findById(id);
 
-        if(!deletedNote){
-            return res.status(500).json({
-                    message : "The note can not be find by del controller in dailynotes controller"
-                })
+        if (!noteToArchive) {
+            return res.status(404).json({ message: "Note not found for deletion." });
         }
-
-        res.status(200).json({
-            message : "The note has been finded and deleted ( dailynote controller )",
-            deletedNote : deletedNote
-        })
-    }
-    catch(error){
-        console.log(`Error find in daily note controller in del catch block : ${error.message}`);
-        res.status(500).json({ 
-            message: 'Error find in daily note controller in del catch block', 
-            error: error.message 
+        
+        // 2. Create the archive entry (Soft Delete)
+        await DeletedNoteModel.create({
+            originalId: noteToArchive._id,
+            title: noteToArchive.title,
+            content: noteToArchive.content,
+            madeby: noteToArchive.madeby,
         });
+
+        // 3. Permanently delete the note from the active model
+        await DailyNoteModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Note successfully moved to trash." });
+    }
+    catch (error) {
+        console.error("Soft Delete Error:", error.message);
+        res.status(500).json({ message: "Server error during soft deletion." });
     }
 }
 
+// --- 2. VIEW DELETED NOTES CONTROLLER (GET) ---
+const viewDeletedNotes = async (req, res) => {
+    try {
+        const deletedNotes = await DeletedNoteModel.find().sort({ deletedAt: -1 }); 
+        res.status(200).json({ deletedNotes });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching deleted notes." });
+    }
+};
 
-export { add , view, del } 
+// --- 3. PERMANENT DELETE CONTROLLER (DELETE) ---
+const permanentlyDeleteNote = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedNoteModel
+        
+        const permanentlyDeleted = await DeletedNoteModel.findByIdAndDelete(id);
+
+        if (!permanentlyDeleted) {
+            return res.status(404).json({ message: "Deleted note entry not found in trash." });
+        }
+
+        res.status(200).json({ message: "Note permanently deleted from trash." });
+
+    } catch (error) {
+        console.error("Permanent Delete Error:", error.message);
+        res.status(500).json({ message: "Server error during permanent deletion." });
+    }
+};
+
+export { add , view, deleteNote, viewDeletedNotes, permanentlyDeleteNote } 

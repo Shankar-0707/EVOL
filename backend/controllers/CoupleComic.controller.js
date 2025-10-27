@@ -4,6 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 import dotenv from "dotenv";
 dotenv.config(); 
 import CoupleComicModel from '../models/CoupleComic.model.js';
+import DeletedComicModel from '../models/DeletedComic.model.js';
 
 // Initialize the Gemini AI Client
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -75,20 +76,72 @@ const viewComics = async (req, res) => {
 const deleteComic = async (req, res) => {
     try {
         const { id } = req.params; 
-        
-        const deletedComic = await CoupleComicModel.findByIdAndDelete(id);
 
-        if (!deletedComic) {
-            return res.status(404).json({ message: "Comic not found." });
+        const comicToArchive = await CoupleComicModel.findById(id);
+
+        if (!comicToArchive) {
+            return res.status(404).json({ message: "Comic not found for deletion." });
         }
 
-        res.status(200).json({ message: "Comic successfully deleted." });
+        await DeletedComicModel.create({
+            originalId: comicToArchive._id,
+            theme: comicToArchive.theme,
+            comicTitle: comicToArchive.comicTitle,
+            panels: comicToArchive.panels,
+            // deletedAt defaults to Date.now()
+        });
+
+        // 3. Permanently delete the comic from the active model
+        await CoupleComicModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Comic successfully moved to trash." });
+        
+        // const deletedComic = await CoupleComicModel.findByIdAndDelete(id);
+
+        // if (!deletedComic) {
+        //     return res.status(404).json({ message: "Comic not found." });
+        // }
+
+        // res.status(200).json({ message: "Comic successfully deleted." });
 
     } catch (error) {
-        console.error("Delete Comic Error:", error.message);
-        res.status(500).json({ message: "Server error during comic deletion." });
+        console.error("Soft Delete Error:", error.message);
+        res.status(500).json({ message: "Server error during comic deletion (soft)." });
     }
 };
 
 
-export { generateComic, viewComics, deleteComic };
+
+// --- 2. VIEW DELETED COMICS CONTROLLER (GET) ---
+const viewDeletedComics = async (req, res) => {
+    try {
+        // Fetch all deleted comics, sorted by deletion time
+        const deletedComics = await DeletedComicModel.find().sort({ deletedAt: -1 }); 
+        res.status(200).json({ deletedComics });
+    } catch (error) {
+        console.error("View Deleted Comics Error:", error.message);
+        res.status(500).json({ message: "Error fetching deleted comics." });
+    }
+};
+
+// --- 3. PERMANENT DELETE CONTROLLER (DELETE) ---
+const permanentlyDeleteComic = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedComicModel
+        
+        const permanentlyDeleted = await DeletedComicModel.findByIdAndDelete(id);
+
+        if (!permanentlyDeleted) {
+            return res.status(404).json({ message: "Deleted comic entry not found in trash." });
+        }
+
+        res.status(200).json({ message: "Comic permanently deleted from trash." });
+
+    } catch (error) {
+        console.error("Permanent Delete Error:", error.message);
+        res.status(500).json({ message: "Server error during permanent deletion." });
+    }
+};
+
+
+export { generateComic, viewComics, deleteComic, viewDeletedComics, permanentlyDeleteComic };
