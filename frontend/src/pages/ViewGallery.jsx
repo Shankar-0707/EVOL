@@ -6,8 +6,6 @@ import { ChevronLeft, UploadCloud, Trash2, Loader2, Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../utils/api";
 
-
-
 import { motion, useSpring, useTransform } from "framer-motion";
 
 // const BASE_API_URL = "https://evol-k431.onrender.com/our-gallery";
@@ -150,7 +148,7 @@ const ViewGallery = () => {
       // Delete request uses MongoDB's _id
       await API.delete(`/our-gallery/delete-photo/${id}`);
       setPhotos(photos.filter((photo) => photo._id !== id));
-      toast.success("Photo deleted successfully!", {
+      toast.success("Photo archived successfully!", {
         iconTheme: {
           primary: "#ec4899", // pink-500 color
           secondary: "#fff", // icon ke andar ka color
@@ -248,7 +246,7 @@ const ViewGallery = () => {
             </motion.button>
             {/* Back to Add Photo Button */}
             <motion.button
-              onClick={() => navigate("/add-gallery")}
+              onClick={() => navigate("/our-gallery/upload-photo")}
               className="flex items-center px-4 py-2 bg-teal-500 text-white rounded-full font-medium hover:bg-teal-600 transition duration-150 shadow-md"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -256,6 +254,17 @@ const ViewGallery = () => {
             >
               <UploadCloud size={20} className="mr-1" />
               Add New Photo
+            </motion.button>
+
+            <motion.button
+              onClick={() => navigate("/our-gallery/view-all-deleted-photos")}
+              className="flex items-center px-4 py-2 rounded-full font-medium transition duration-150 shadow-lg bg-gray-500 text-white hover:bg-gray-600"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isLoading}
+            >
+              <Trash2 size={20} className="mr-1" />
+              Deleted Photos
             </motion.button>
           </div>
         </header>

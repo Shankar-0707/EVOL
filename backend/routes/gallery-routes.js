@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadPhoto, viewPhotos, deletePhoto } from "../controllers/Gallery.controller.js";
+import { uploadPhoto, viewPhotos, deletePhoto, viewDeletedPhotos, permanentlyDeletePhoto } from "../controllers/Gallery.controller.js";
 import upload from "../middlewares/multer.js";
 const router = express.Router();
 
@@ -14,5 +14,9 @@ router.get("/view-gallery", viewPhotos);
 
 // 4. DELETE Route: Delete photo by MongoDB ID
 router.delete("/delete-photo/:id", deletePhoto);
+
+// --- NEW ARCHIVE ROUTES ---
+router.get("/view-all-deleted-photos", viewDeletedPhotos); 
+router.delete("/permanently-delete/:id", permanentlyDeletePhoto);
 
 export default router;

@@ -1,5 +1,5 @@
 import express from "express";
-import { addMemory, viewMemories, deleteMemory } from "../controllers/Memories.controller.js";
+import { addMemory, viewMemories, deleteMemory, viewDeletedMemories, permanentlyDeleteMemory } from "../controllers/Memories.controller.js";
 const router = express.Router();
 
 
@@ -11,5 +11,9 @@ router.get("/view-memories", viewMemories);
 
 // 3. Route for deleting a memory by ID
 router.delete("/delete-memory/:id", deleteMemory);
+
+// --- NEW ARCHIVE ROUTES ---
+router.get("/view-all-deleted-memories", viewDeletedMemories); 
+router.delete("/permanently-delete/:id", permanentlyDeleteMemory);
 
 export default router;

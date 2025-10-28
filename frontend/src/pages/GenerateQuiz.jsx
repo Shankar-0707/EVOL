@@ -76,7 +76,7 @@ const GenerateQuiz = () => {
             };
             
             // 1. Call backend to save the full entry
-            await API.post(`/save-answer`, payload);
+            await API.post(`/couple-quiz/save-answer`, payload);
             
             alert(`Question & Answer saved! Ready for the next one!`);
             

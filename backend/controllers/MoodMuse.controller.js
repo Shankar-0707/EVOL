@@ -4,6 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 import dotenv from "dotenv"
 dotenv.config(); // Load environment variables
 import MoodMuseModel from '../models/MoodMuse.model.js';
+import DeletedMoodMuseModel from '../models/DeletedMoodMuse.js';
 
 // Initialize the Gemini AI Client
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -69,24 +70,64 @@ const viewEntries = async (req, res) => {
     }
 };
 
-// --- DELETE ENTRY CONTROLLER (DELETE) ---
-const deleteEntry = async (req, res) => {
+const deleteEntry = async (req, res) => { 
     try {
-        const { id } = req.params; 
+        const id = req.params.id; // Original MongoDB ID
         
-        const deletedEntry = await MoodMuseModel.findByIdAndDelete(id);
+        // 1. Find the original entry
+        const entryToArchive = await MoodMuseModel.findById(id);
 
-        if (!deletedEntry) {
-            return res.status(404).json({ message: "Entry not found." });
+        if (!entryToArchive) {
+            return res.status(404).json({ message: "Mood Muse entry not found for deletion." });
         }
+        
+        // 2. Soft Delete: Create archive entry
+        await DeletedMoodMuseModel.create({
+            originalId: entryToArchive._id,
+            mood: entryToArchive.mood,
+            promptType: entryToArchive.promptType,
+            generatedContent: entryToArchive.generatedContent,
+            createdAt: entryToArchive.createdAt, // Preserve original date
+        });
 
-        res.status(200).json({ message: "Entry successfully deleted." });
+        // 3. Hard Delete from active model
+        await MoodMuseModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Mood Muse entry successfully moved to trash." });
 
     } catch (error) {
-        console.error("Delete Entry Error:", error.message);
-        res.status(500).json({ message: "Server error during entry deletion." });
+        console.error("Soft Delete Error:", error.message);
+        res.status(500).json({ message: "Server error during soft deletion." });
     }
 };
 
+// --- 2. VIEW DELETED ENTRIES CONTROLLER (GET) ---
+const viewDeletedEntries = async (req, res) => {
+    try {
+        const deletedEntries = await DeletedMoodMuseModel.find().sort({ deletedAt: -1 }); 
+        res.status(200).json({ deletedEntries });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching deleted Mood Muse entries." });
+    }
+};
 
-export { generateContent, viewEntries, deleteEntry };
+// --- 3. PERMANENT DELETE CONTROLLER (DELETE) ---
+const permanentlyDeleteEntry = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedMoodMuseModel
+        
+        const permanentlyDeleted = await DeletedMoodMuseModel.findByIdAndDelete(id);
+
+        if (!permanentlyDeleted) {
+            return res.status(404).json({ message: "Deleted Mood Muse entry not found in trash." });
+        }
+
+        res.status(200).json({ message: "Entry permanently deleted from trash." });
+
+    } catch (error) {
+        console.error("Permanent Delete Error:", error.message);
+        res.status(500).json({ message: "Server error during permanent deletion." });
+    }
+};
+
+export { generateContent, viewEntries, deleteEntry, viewDeletedEntries, permanentlyDeleteEntry };

@@ -19,6 +19,11 @@ import GenerateComic from './pages/GenerateComic';
 import ViewComics from './pages/ViewComics';
 import ViewDeletedComics from './pages/ViewDeletedComics';
 import ViewDeletedNotes from './pages/ViewDeletedNotes';
+import ViewDeletedQuizzes from './pages/ViewDeletedQuiz';
+import ViewDeletedMoodMuse from './pages/ViewDeletedMoodMuse';
+import ViewDeletedPhotos from './pages/ViewDeletedPhotos';
+import ViewDeletedMemories from './pages/ViewDeletedMemories';
+import ViewDeletedSongs from './pages/ViewDeletedSongs';
 
 
 const App = () => {
@@ -52,6 +57,11 @@ const App = () => {
                     <Route path="/couple-comics/view" element={<ViewComics />} />
                     <Route path="/couple-comics/view-all-deleted-comics" element={<ViewDeletedComics />} />
                     <Route path="/daily-notes/view-all-deleted-notes" element={<ViewDeletedNotes />} />
+                    <Route path="/couple-quiz/view-all-deleted-quizzes" element={<ViewDeletedQuizzes />} />
+                    <Route path="/mood-muse/view-all-deleted-entries" element={<ViewDeletedMoodMuse />} />
+                    <Route path="/our-gallery/view-all-deleted-photos" element={<ViewDeletedPhotos />} />
+                    <Route path="/our-memories/view-all-deleted-memories" element={<ViewDeletedMemories />} />
+                    <Route path="/our-songs/view-all-deleted-songs" element={<ViewDeletedSongs />} />
                     
                     {/* These are the other pages that will be rendered inside the <Outlet /> */}
                     {/* <Route path="favorites" element={<Favorites />} />

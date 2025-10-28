@@ -14,8 +14,6 @@ import { motion, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
 import API from "../utils/api";
 
-
-
 // const BASE_API_URL = "https://evol-k431.onrender.com/mood-muse";
 
 // --- CUSTOM ANIMATION COMPONENTS (Reused from ViewMemories) ---
@@ -151,26 +149,22 @@ const ViewMoodMuse = () => {
   const handleDelete = async (id) => {
     if (
       !window.confirm(
-        "Are you sure you want to delete this AI-generated entry?"
+        "Are you sure you want to archive this AI-generated entry?"
       )
     ) {
       return;
     }
 
     try {
+      // DELETE request to the soft-delete endpoint
       await API.delete(`/mood-muse/delete/${id}`);
       setEntries(entries.filter((entry) => entry._id !== id));
-      toast.success("Entry deleted successfully!", {
-        iconTheme: {
-          primary: "#ec4899", // pink-500 color
-          secondary: "#fff", // icon ke andar ka color
-        },
-      });
+      alert("Entry moved to archive successfully!");
     } catch (err) {
       console.error("Delete Error:", err);
       const errorMessage =
-        err.response?.data?.message || "Failed to delete entry.";
-      toast.error(`Error: ${errorMessage}`);
+        err.response?.data?.message || "Failed to archive entry.";
+      alert(`Error: ${errorMessage}`);
     }
   };
 
@@ -196,7 +190,7 @@ const ViewMoodMuse = () => {
     }
 
     if (error) {
-      // ... Error display
+      
       return (
         <div className="text-center py-16 text-red-500 bg-red-100 p-6 rounded-xl border border-red-300">
           <p className="text-xl font-semibold">Error:</p>
@@ -240,6 +234,7 @@ const ViewMoodMuse = () => {
               }}
             >
               <div className="flex justify-between items-start">
+                {/* ... Content details ... */}
                 <div className="mb-4">
                   <h2 className="text-2xl font-extrabold text-gray-800 flex items-center">
                     {entry.promptType} for{" "}
@@ -258,6 +253,7 @@ const ViewMoodMuse = () => {
                   </p>
                 </div>
 
+                {/* TRASH BUTTON NOW CALLS SOFT DELETE */}
                 <motion.button
                   onClick={() => handleDelete(entry._id)}
                   className="text-red-500 p-2 rounded-full hover:bg-red-100 transition duration-150 flex-shrink-0"
@@ -267,8 +263,7 @@ const ViewMoodMuse = () => {
                   <Trash2 size={20} />
                 </motion.button>
               </div>
-
-              {/* AI Content Display */}
+              {/* ... AI Content Display ... */}
               <pre className="whitespace-pre-wrap text-gray-700 leading-relaxed font-serif bg-gray-50 p-4 rounded-lg border-l-2 border-pink-300">
                 {entry.generatedContent}
               </pre>
@@ -279,18 +274,62 @@ const ViewMoodMuse = () => {
     );
   };
 
+  //   return (
+  //     <div className="min-h-full relative overflow-hidden">
+  //       {/* Background Glow (Reused from Gallery/Memories, using Pink) */}
+  //       <motion.div
+  //         className="fixed inset-0 pointer-events-none z-0"
+  //         style={{
+  //           background: `radial-gradient(400px at ${mousePosition.x * 20 + 50}% ${
+  //             mousePosition.y * 20 + 50
+  //           }%, rgba(236, 72, 153, 0.15) 0%, rgba(255, 255, 255, 0) 100%)`,
+  //           transition: "background 0.3s ease-out",
+  //         }}
+  //       />
+
+  //       <div className="relative z-10">
+  //         {/* Header and Control Buttons */}
+  //         <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200 bg-gray-50/90 backdrop-blur-sm sticky top-0 z-20">
+  //           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 tracking-tight">
+  //             <span className="text-purple-600">Mood</span> Muse
+  //           </h1>
+
+  //           <div className="flex space-x-3">
+  //             {/* Back to Dashboard Button */}
+  //             <motion.button
+  //               onClick={() => navigate("/")}
+  //               className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition duration-150 shadow-md"
+  //               whileHover={{ scale: 1.05 }}
+  //               whileTap={{ scale: 0.95 }}
+  //               disabled={isLoading}
+  //             >
+  //               <ChevronLeft size={20} className="mr-1" />
+  //               DashBoard
+  //             </motion.button>
+  //             {/* Back to Generate Button */}
+  //             <motion.button
+  //               onClick={() => navigate("/mood-muse/generate")}
+  //               className="flex items-center px-4 py-2 bg-pink-500 text-white rounded-full font-medium hover:bg-pink-600 transition duration-150 shadow-md"
+  //               whileHover={{ scale: 1.05 }}
+  //               whileTap={{ scale: 0.95 }}
+  //               disabled={isLoading}
+  //             >
+  //               <MessageSquare size={20} className="mr-1" />
+  //               Generate New
+  //             </motion.button>
+  //           </div>
+  //         </header>
+
+  //         {/* Content Rendering */}
+  //         {renderContent()}
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
   return (
     <div className="min-h-full relative overflow-hidden">
-      {/* Background Glow (Reused from Gallery/Memories, using Pink) */}
-      <motion.div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: `radial-gradient(400px at ${mousePosition.x * 20 + 50}% ${
-            mousePosition.y * 20 + 50
-          }%, rgba(236, 72, 153, 0.15) 0%, rgba(255, 255, 255, 0) 100%)`,
-          transition: "background 0.3s ease-out",
-        }}
-      />
+      {/* ... Background Glow ... */}
 
       <div className="relative z-10">
         {/* Header and Control Buttons */}
@@ -300,6 +339,7 @@ const ViewMoodMuse = () => {
           </h1>
 
           <div className="flex space-x-3">
+            {/* Back to Dashboard Button (remains the same) */}
             {/* Back to Dashboard Button */}
             <motion.button
               onClick={() => navigate("/")}
@@ -309,9 +349,10 @@ const ViewMoodMuse = () => {
               disabled={isLoading}
             >
               <ChevronLeft size={20} className="mr-1" />
-              DashBoard
+              Dashboard
             </motion.button>
-            {/* Back to Generate Button */}
+            {/* Generate New Button (remains the same) */}
+
             <motion.button
               onClick={() => navigate("/mood-muse/generate")}
               className="flex items-center px-4 py-2 bg-pink-500 text-white rounded-full font-medium hover:bg-pink-600 transition duration-150 shadow-md"
@@ -321,6 +362,18 @@ const ViewMoodMuse = () => {
             >
               <MessageSquare size={20} className="mr-1" />
               Generate New
+            </motion.button>
+
+            {/* --- NEW BUTTON: VIEW DELETED HISTORY --- */}
+            <motion.button
+              onClick={() => navigate("/mood-muse/view-all-deleted-entries")}
+              className="flex items-center px-4 py-2 rounded-full font-medium transition duration-150 shadow-lg bg-gray-500 text-white hover:bg-gray-600"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isLoading}
+            >
+              <Trash2 size={20} className="mr-1" />
+              Deleted History
             </motion.button>
           </div>
         </header>

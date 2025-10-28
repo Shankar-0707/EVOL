@@ -1,6 +1,7 @@
 // src/controllers/Memories.controller.js
 
 import MemoryModel from '../models/Memories.model.js'; 
+import DeletedMemoryModel from '../models/DeletedMemory.model.js';
 
 // --- ADD MEMORY CONTROLLER (POST) ---
 const addMemory = async (req, res) => {
@@ -41,27 +42,65 @@ const viewMemories = async (req, res) => {
     }
 };
 
-// --- DELETE MEMORY CONTROLLER (DELETE) ---
-const deleteMemory = async (req, res) => {
+const deleteMemory = async (req, res) => { 
     try {
-        const { id } = req.params; // Get the MongoDB document ID
+        const id = req.params.id; // Original MongoDB ID
         
-        const deletedMemory = await MemoryModel.findByIdAndDelete(id);
+        const memoryToArchive = await MemoryModel.findById(id);
 
-        if (!deletedMemory) {
-            return res.status(404).json({ message: "Memory not found." });
+        if (!memoryToArchive) {
+            return res.status(404).json({ message: "Memory not found for deletion." });
         }
-
-        res.status(200).json({
-            message: "Memory successfully deleted.",
-            deletedMemory: deletedMemory
+        
+        // 2. Soft Delete: Create archive entry
+        await DeletedMemoryModel.create({
+            originalId: memoryToArchive._id,
+            title: memoryToArchive.title,
+            description: memoryToArchive.description,
+            date: memoryToArchive.date,
+            addedBy: memoryToArchive.addedBy,
+            createdAt: memoryToArchive.createdAt, // Preserve original date
         });
 
+        // 3. Hard Delete from active model
+        await MemoryModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Memory successfully moved to archive." });
+
     } catch (error) {
-        console.error("Delete Memory Error:", error.message);
-        res.status(500).json({ message: "Server error during memory deletion." });
+        console.error("Soft Delete Memory Error:", error.message);
+        res.status(500).json({ message: "Server error during memory soft deletion." });
+    }
+};
+
+// --- 2. VIEW DELETED MEMORIES CONTROLLER (GET) ---
+const viewDeletedMemories = async (req, res) => {
+    try {
+        const deletedMemories = await DeletedMemoryModel.find().sort({ deletedAt: -1 }); 
+        res.status(200).json({ deletedMemories });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching deleted memories." });
+    }
+};
+
+// --- 3. PERMANENT DELETE CONTROLLER (DELETE) ---
+const permanentlyDeleteMemory = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedMemoryModel
+        
+        const permanentlyDeleted = await DeletedMemoryModel.findByIdAndDelete(id);
+
+        if (!permanentlyDeleted) {
+            return res.status(404).json({ message: "Deleted memory entry not found in trash." });
+        }
+
+        res.status(200).json({ message: "Memory permanently deleted from trash." });
+
+    } catch (error) {
+        console.error("Permanent Delete Memory Error:", error.message);
+        res.status(500).json({ message: "Server error during permanent deletion." });
     }
 };
 
 
-export { addMemory, viewMemories, deleteMemory };
+export { addMemory, viewMemories, deleteMemory, viewDeletedMemories, permanentlyDeleteMemory };

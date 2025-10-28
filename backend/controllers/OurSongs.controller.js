@@ -5,6 +5,7 @@ import axios from 'axios';
 // Assuming you have 'dotenv' set up in your server.js for process.env
 // If not, you may need: import 'dotenv/config'; 
 import SongModel from '../models/OurSongs.model.js'; 
+import DeletedSongModel from "../models/DeletedSong.model.js";
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -114,29 +115,66 @@ const viewSongs = async (req, res) => {
     }
 };
 
-// --- DELETE SONG CONTROLLER ---
-const deleteSong = async (req, res) => {
+// --- 1. SOFT DELETE SONG CONTROLLER (Archives the song) ---
+const deleteSong = async (req, res) => { 
     try {
-        const { id } = req.params; // Get the Spotify ID (which we use as _id)
-        console.log("Deleting song with id:", id);
-        // Use findOneAndDelete to delete by the unique spotifyId
-        const deletedSong = await SongModel.findOneAndDelete({ spotifyId: id });
+        const { id } = req.params; // Original MongoDB ID
+        
+        const songToArchive = await SongModel.findById(id);
 
-        if (!deletedSong) {
-            // Return 404 if the song wasn't found
-            return res.status(404).json({ message: "Song not found in the collection." });
+        if (!songToArchive) {
+            return res.status(404).json({ message: "Song not found for deletion." });
         }
-
-        res.status(200).json({
-            message: "Song successfully removed from collection.",
-            deletedSong: deletedSong
+        
+        // 2. Soft Delete: Create archive entry
+        await DeletedSongModel.create({
+            originalId: songToArchive._id,
+            title: songToArchive.title,
+            artist: songToArchive.artist,
+            spotifyId: songToArchive.spotifyId,
+            imageUrl: songToArchive.imageUrl,
+            addedBy: songToArchive.addedBy,
+            addedAt: songToArchive.addedAt, // Preserve original date
         });
 
+        // 3. Hard Delete from active model
+        await SongModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Song successfully moved to archive." });
+
     } catch (error) {
-        console.error("Delete Song Error:", error.message);
-        // Return 500 for server errors
-        res.status(500).json({ message: "Server error during song deletion." });
+        console.error("Soft Delete Song Error:", error.message);
+        res.status(500).json({ message: "Server error during song soft deletion." });
     }
 };
 
-export { searchSpotify, addSong, viewSongs, deleteSong };
+// --- 2. VIEW DELETED SONGS CONTROLLER (GET) ---
+const viewDeletedSongs = async (req, res) => {
+    try {
+        const deletedSongs = await DeletedSongModel.find().sort({ deletedAt: -1 }); 
+        res.status(200).json({ deletedSongs });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching deleted songs." });
+    }
+};
+
+// --- 3. PERMANENT DELETE CONTROLLER (DELETE) ---
+const permanentlyDeleteSong = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedSongModel
+        
+        const permanentlyDeleted = await DeletedSongModel.findByIdAndDelete(id);
+
+        if (!permanentlyDeleted) {
+            return res.status(404).json({ message: "Deleted song entry not found in trash." });
+        }
+
+        res.status(200).json({ message: "Song permanently deleted from trash." });
+
+    } catch (error) {
+        console.error("Permanent Delete Song Error:", error.message);
+        res.status(500).json({ message: "Server error during permanent deletion." });
+    }
+};
+
+export { searchSpotify, addSong, viewSongs, deleteSong, viewDeletedSongs, permanentlyDeleteSong };

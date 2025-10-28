@@ -1,4 +1,4 @@
-// src/pages/ViewDeletedNotes.jsx
+// src/pages/ViewDeletedPhotos.jsx
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -9,26 +9,18 @@ import {
   Loader2,
   RotateCcw,
   XCircle,
-  MessageSquare,
-  BookOpen,
+  Camera,
+  UploadCloud,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../utils/api";
 import toast from "react-hot-toast";
-// const BASE_API_URL = 'http://localhost:5000/daily-notes';
 
- const formatDate = (dateString) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+// const BASE_API_URL = 'http://localhost:5000/our-gallery';
 
 // --- MODAL COMPONENT ---
-const NoteReviewModal = ({ note, onClose, onPermanentDelete }) => {
-  if (!note) return null;
+const PhotoReviewModal = ({ photo, onClose, onPermanentDelete }) => {
+  if (!photo) return null;
 
   const modalVariants = {
     hidden: { opacity: 0, y: -50, scale: 0.8 },
@@ -36,7 +28,14 @@ const NoteReviewModal = ({ note, onClose, onPermanentDelete }) => {
     exit: { opacity: 0, y: 50, scale: 0.8 },
   };
 
- 
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
   return (
     <motion.div
@@ -47,7 +46,7 @@ const NoteReviewModal = ({ note, onClose, onPermanentDelete }) => {
       onClick={onClose}
     >
       <motion.div
-        className="bg-white p-6 rounded-2xl shadow-2xl max-w-xl w-full"
+        className="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
         variants={modalVariants}
         initial="hidden"
         animate="visible"
@@ -55,8 +54,8 @@ const NoteReviewModal = ({ note, onClose, onPermanentDelete }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4 pb-2 border-b">
-          <h3 className="text-2xl font-extrabold text-red-600">
-            Review Deleted Note
+          <h3 className="text-2xl font-extrabold text-teal-600">
+            Review Deleted Photo
           </h3>
           <motion.button
             onClick={onClose}
@@ -67,26 +66,32 @@ const NoteReviewModal = ({ note, onClose, onPermanentDelete }) => {
           </motion.button>
         </div>
 
-        <h2 className="text-xl font-bold text-gray-800 mb-2">{note.title}</h2>
-
-        {/* Note Details */}
-        <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-pink-400 mb-4 max-h-96 overflow-y-auto">
-          <p className="whitespace-pre-wrap text-gray-700 leading-relaxed font-serif">
-            {note.content}
-          </p>
+        <div className="w-full h-80 rounded-xl overflow-hidden mb-4 border border-gray-200">
+          {/* Display the Base64 image URL */}
+          <img
+            src={photo.imageUrl}
+            alt={photo.caption}
+            className="w-full h-full object-cover"
+          />
         </div>
 
+        <h2 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
+          {photo.caption}
+        </h2>
+
         <p className="text-sm text-gray-500">
-          Made by:{" "}
-          <span className="font-semibold text-pink-600">{note.madeby}</span>
+          Original Uploader:{" "}
+          <span className="font-semibold text-teal-600">
+            {photo.uploadedBy}
+          </span>
         </p>
         <p className="text-sm text-gray-400 mb-4">
-          Archived on: {formatDate(note.deletedAt)}
+          Archived on: {formatDate(photo.deletedAt)}
         </p>
 
         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
           <motion.button
-            onClick={() => onPermanentDelete(note._id)}
+            onClick={() => onPermanentDelete(photo._id)}
             className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -100,61 +105,71 @@ const NoteReviewModal = ({ note, onClose, onPermanentDelete }) => {
 };
 
 // --- MAIN COMPONENT ---
-const ViewDeletedNotes = () => {
+const ViewDeletedPhotos = () => {
   const navigate = useNavigate();
 
-  const [deletedNotes, setDeletedNotes] = useState([]);
+  const [deletedPhotos, setDeletedPhotos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedNote, setSelectedNote] = useState(null);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-  // --- FETCH DELETED NOTES FUNCTION ---
-  const fetchDeletedNotes = async () => {
+  // --- FETCH DELETED PHOTOS FUNCTION ---
+  const fetchDeletedPhotos = async () => {
+    /* ... implementation ... */
     setIsLoading(true);
     setError(null);
     try {
-      const response = await API.get(`/daily-notes/view-all-deleted-notes`);
-      setDeletedNotes(response.data.deletedNotes);
+      const response = await API.get(`/our-gallery/view-all-deleted-photos`);
+      setDeletedPhotos(response.data.deletedPhotos);
     } catch (err) {
       console.error("Fetch Deleted Error:", err);
-      setError("Could not load deleted notes.");
-      setDeletedNotes([]);
+      setError("Could not load deleted photos.");
+      setDeletedPhotos([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDeletedNotes();
+    fetchDeletedPhotos();
   }, []);
 
   // --- PERMANENT DELETE FUNCTION ---
   const handlePermanentDelete = async (id) => {
     try {
-      // DELETE request to the new permanent delete endpoint
-      await API.delete(`/daily-notes/permanently-delete/${id}`);
-      setDeletedNotes(deletedNotes.filter((note) => note._id !== id));
-      setSelectedNote(null); // Close the modal
-      toast.success("Note permanently erased! 💀");
+      await API.delete(`/our-gallery/permanently-delete/${id}`);
+      setDeletedPhotos(deletedPhotos.filter((photo) => photo._id !== id));
+      setSelectedPhoto(null); // Close the modal
+      toast("Photo permanently erased! 💀");
     } catch (err) {
       console.error("Permanent Delete Error:", err);
       const errorMessage =
-        err.response?.data?.message || "Failed to permanently delete note.";
-      alert(`Error: ${errorMessage}`);
+        err.response?.data?.message || "Failed to permanently delete photo.";
+      toast(`Error: ${errorMessage}`);
     }
   };
 
-  // --- RENDERING LOGIC ---
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="text-center py-16 text-red-500">
+        <div className="text-center py-16 text-pink-500">
           <Loader2 size={32} className="mx-auto animate-spin mb-3" />
-          <p className="text-lg font-medium">Loading deleted comic strips...</p>
+          <p className="text-lg font-medium">Summoning the muse...</p>
         </div>
       );
     }
+
     if (error) {
+      // ... Error display
       return (
         <div className="text-center py-16 text-red-500 bg-red-100 p-6 rounded-xl border border-red-300">
           <p className="text-xl font-semibold">Error:</p>
@@ -163,20 +178,20 @@ const ViewDeletedNotes = () => {
       );
     }
 
-    if (deletedNotes.length === 0) {
+    if (deletedPhotos.length === 0) {
       return (
         <div className="text-center py-16 text-gray-500 bg-white p-6 rounded-xl shadow-lg">
           <p className="text-lg">
             The trash is empty! Nothing has been deleted.
           </p>
           <motion.button
-            onClick={() => navigate("/view-all-daily-notes")}
-            className="mt-4 px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition"
+            onClick={() => navigate("/our-gallery/view-gallery")}
+            className="mt-4 px-6 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 transition"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <RotateCcw size={20} className="inline mr-1" /> Go Back to Active
-            Notes
+            Gallery
           </motion.button>
         </div>
       );
@@ -186,35 +201,36 @@ const ViewDeletedNotes = () => {
     return (
       <div className="space-y-8 max-w-5xl mx-auto">
         <p className="text-sm text-red-600 font-semibold flex items-center justify-center p-3 bg-red-50 border border-red-200 rounded-lg">
-          <XCircle size={16} className="mr-2" /> These notes are archived. Click
-          to review and permanently delete.
+          <XCircle size={16} className="mr-2" /> These photos are archived.
+          Click to review and permanently delete.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {deletedNotes.map((note, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {deletedPhotos.map((photo, index) => (
             <motion.div
-              key={note._id}
-              onClick={() => setSelectedNote(note)}
+              key={photo._id}
+              onClick={() => setSelectedPhoto(photo)} // Open modal on click
               className="bg-white p-4 rounded-2xl shadow-xl border-l-8 border-gray-400 opacity-80 cursor-pointer hover:opacity-100 transition duration-200 transform hover:translate-y-[-2px]"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 * index }}
             >
               <div className="flex justify-between items-center">
-                <div>
+                <div className="flex-grow pr-2">
                   <h3 className="text-xl font-bold text-gray-800 line-clamp-1">
-                    {note.title}
+                    {photo.caption}
                   </h3>
-                  <p className="text-sm text-gray-500 mb-1 line-clamp-2">
-                    {note.content}
-                  </p>
                   <p className="text-xs text-red-400">
-                    Archived: {formatDate(note.deletedAt)}
+                    Archived: {formatDate(photo.deletedAt)}
                   </p>
                 </div>
-                <MessageSquare
-                  size={28}
-                  className="text-gray-500 flex-shrink-0"
+                <Camera size={28} className="text-gray-500 flex-shrink-0" />
+              </div>
+              <div className="w-full h-32 mt-3 rounded-lg overflow-hidden">
+                <img
+                  src={photo.imageUrl}
+                  alt={photo.caption}
+                  className="w-full h-full object-cover"
                 />
               </div>
             </motion.div>
@@ -229,7 +245,7 @@ const ViewDeletedNotes = () => {
       {/* Header and Control Buttons */}
       <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
         <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 tracking-tight">
-          <span className="text-pink-600">Deleted</span> Notes
+          <span className="text-teal-600">Deleted</span> Photos
         </h1>
 
         <div className="flex space-x-3">
@@ -241,35 +257,19 @@ const ViewDeletedNotes = () => {
             whileTap={{ scale: 0.95 }}
             disabled={isLoading}
           >
-            <ChevronLeft size={20} className="mr-1" />
-            Dashboard
+            <ChevronLeft size={20} className="mr-1" /> Dashboard
           </motion.button>
 
-          {/* ✅ NEW BUTTON — Generate New Note */}
-    <motion.button
-      onClick={() => navigate("/daily-notes")}
-      className="flex items-center px-4 py-2 bg-green-500 text-white rounded-full font-medium hover:bg-green-600 transition duration-150 shadow-md"
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      disabled={isLoading}
-    >
-      <MessageSquare size={20} className="mr-1" />
-      Generate New
-    </motion.button>
-
-          {/* Back to Active Notes Button */}
+          {/* Back to Active Gallery Button */}
           <motion.button
-            onClick={() => navigate("/view-all-daily-notes")}
-            className="flex items-center px-4 py-2 bg-pink-500 text-white rounded-full font-medium hover:bg-pink-600 transition duration-150 shadow-md"
+            onClick={() => navigate("/our-gallery/view-gallery")}
+            className="flex items-center px-4 py-2 bg-teal-500 text-white rounded-full font-medium hover:bg-teal-600 transition duration-150 shadow-md"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             disabled={isLoading}
           >
-            <BookOpen size={20} className="mr-1" />
-            Active Notes
+            <Camera size={20} className="mr-1" /> Active Gallery
           </motion.button>
-
-
         </div>
       </header>
 
@@ -278,10 +278,10 @@ const ViewDeletedNotes = () => {
 
       {/* --- RENDER THE MODAL --- */}
       <AnimatePresence>
-        {selectedNote && (
-          <NoteReviewModal
-            note={selectedNote}
-            onClose={() => setSelectedNote(null)}
+        {selectedPhoto && (
+          <PhotoReviewModal
+            photo={selectedPhoto}
+            onClose={() => setSelectedPhoto(null)}
             onPermanentDelete={handlePermanentDelete}
           />
         )}
@@ -290,4 +290,4 @@ const ViewDeletedNotes = () => {
   );
 };
 
-export default ViewDeletedNotes;
+export default ViewDeletedPhotos;

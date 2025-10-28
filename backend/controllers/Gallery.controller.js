@@ -1,6 +1,7 @@
 // src/controllers/Gallery.controller.js (UPDATED for MongoDB Storage)
 
 import GalleryModel from '../models/Gallery.model.js';
+import DeletedGalleryModel from '../models/DeletedGaller.model.js';
 
 // --- UPLOAD PHOTO CONTROLLER (POST) ---
 const uploadPhoto = async (req, res) => {
@@ -66,24 +67,78 @@ const viewPhotos = async (req, res) => {
     }
 };
 
-// --- DELETE PHOTO CONTROLLER (DELETE) ---
-const deletePhoto = async (req, res) => {
+const deletePhoto = async (req, res) => { 
     try {
-        const { id } = req.params; // MongoDB document ID
+        const id = req.params.id; // Original MongoDB ID
         
-        // Delete the document from MongoDB
-        const deletedPhoto = await GalleryModel.findByIdAndDelete(id);
+        // 1. Find the original photo
+        const photoToArchive = await GalleryModel.findById(id);
 
-        if (!deletedPhoto) {
-            return res.status(404).json({ message: "Photo not found." });
+        if (!photoToArchive) {
+            return res.status(404).json({ message: "Photo not found for deletion." });
         }
+        
+        // 2. Soft Delete: Create archive entry, transferring ALL image data (Buffer)
+        await DeletedGalleryModel.create({
+            originalId: photoToArchive._id,
+            caption: photoToArchive.caption,
+            image: photoToArchive.image, 
+            contentType: photoToArchive.contentType,
+            uploadedBy: photoToArchive.uploadedBy,
+            uploadedAt: photoToArchive.uploadedAt,
+        });
 
-        res.status(200).json({ message: "Photo successfully deleted from MongoDB." });
+        // 3. Hard Delete from active model
+        await GalleryModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Photo successfully moved to trash." });
 
     } catch (error) {
-        console.error("Delete Photo Error:", error.message);
-        res.status(500).json({ message: "Error deleting photo." });
+        console.error("Soft Delete Error:", error.message);
+        res.status(500).json({ message: "Server error during photo soft deletion." });
     }
 };
 
-export { uploadPhoto, viewPhotos, deletePhoto };
+// --- 2. VIEW DELETED PHOTOS CONTROLLER (GET) ---
+const viewDeletedPhotos = async (req, res) => {
+    try {
+        const deletedPhotos = await DeletedGalleryModel.find().sort({ deletedAt: -1 }); 
+        
+        // Convert the Buffer to Base64 URL for the frontend
+        const photosToSend = deletedPhotos.map(photo => ({
+            _id: photo._id,
+            caption: photo.caption,
+            uploadedBy: photo.uploadedBy,
+            uploadedAt: photo.uploadedAt,
+            deletedAt: photo.deletedAt,
+            // Convert Buffer to Base64 string for display
+            imageUrl: `data:${photo.contentType};base64,${photo.image.toString('base64')}`
+        }));
+
+        res.status(200).json({ deletedPhotos: photosToSend });
+    } catch (error) {
+        console.error("View Deleted Photos Error:", error.message);
+        res.status(500).json({ message: "Error fetching deleted photos." });
+    }
+};
+
+// --- 3. PERMANENT DELETE CONTROLLER (DELETE) ---
+const permanentlyDeletePhoto = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedGalleryModel
+        
+        const permanentlyDeleted = await DeletedGalleryModel.findByIdAndDelete(id);
+
+        if (!permanentlyDeleted) {
+            return res.status(404).json({ message: "Deleted photo entry not found in trash." });
+        }
+
+        res.status(200).json({ message: "Photo permanently deleted from trash." });
+
+    } catch (error) {
+        console.error("Permanent Delete Error:", error.message);
+        res.status(500).json({ message: "Server error during permanent deletion." });
+    }
+};
+
+export { uploadPhoto, viewPhotos, deletePhoto, viewDeletedPhotos, permanentlyDeletePhoto };

@@ -149,29 +149,25 @@ const ViewQuiz = () => {
   }, []);
 
   // --- DELETE QUESTION FUNCTION ---
-  const handleDelete = async (id) => {
-    if (
-      !window.confirm("Are you sure you want to delete this quiz question?")
-    ) {
-      return;
-    }
+  const handleDelete = async (id, title) => {
+        if (!window.confirm(`Are you sure you want to archive the quiz`)) {
+            return;
+        }
 
-    try {
-      await API.delete(`/couple-quiz/delete/${id}`);
-      setQuestions(questions.filter((q) => q._id !== id));
-      toast.success("Question deleted successfully!", {
-        iconTheme: {
-          primary: "#ec4899", // pink-500 color
-          secondary: "#fff", // icon ke andar ka color
-        },
-      });
-    } catch (err) {
-      console.error("Delete Error:", err);
-      const errorMessage =
-        err.response?.data?.message || "Failed to delete question.";
-      toast.error(`Error: ${errorMessage}`);
-    }
-  };
+        try {
+            // DELETE request to the soft-delete endpoint
+            await API.delete(`/couple-quiz/delete/${id}`); 
+
+            // Remove the quiz from the active list state immediately
+            setQuestions(questions.filter(quiz => quiz._id !== id));
+            toast("Quiz moved to archive successfully! 🗑️");
+
+        } catch (err) {
+            console.error("Delete Error:", err);
+            const errorMessage = err.response?.data?.message || "Failed to archive quiz.";
+            toast(`Error: ${errorMessage}`);
+        }
+    };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -251,7 +247,7 @@ const ViewQuiz = () => {
                   </div>
 
                   <motion.button
-                    onClick={() => handleDelete(q._id)}
+                    onClick={() => handleDelete(q._id, q.question)}
                     className="text-red-500 p-2 rounded-full hover:bg-red-100 transition duration-150 flex-shrink-0"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
@@ -347,6 +343,16 @@ const ViewQuiz = () => {
               <MessageSquare size={20} className="mr-1" />
               Generate New
             </motion.button>
+
+            {/* --- NEW BUTTON: VIEW DELETED QUIZZES --- */}
+                    <motion.button 
+                        onClick={() => navigate('/couple-quiz/view-all-deleted-quizzes')}
+                        className="flex items-center px-4 py-2 rounded-full font-medium transition duration-150 shadow-lg bg-gray-500 text-white hover:bg-gray-600"
+                        // ...
+                    >
+                        <Trash2 size={20} className="mr-1" />
+                        Deleted Quizzes
+                    </motion.button>
           </div>
         </header>
 
