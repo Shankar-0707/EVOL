@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 // const BASE_API_URL = 'http://localhost:5000/our-songs';
 
 // --- MODAL COMPONENT ---
-const SongReviewModal = ({ song, onClose, onPermanentDelete }) => {
+const SongReviewModal = ({ song, onClose, onPermanentDelete, onRestore }) => {
     if (!song) return null;
     
     const modalVariants = {
@@ -24,7 +24,7 @@ const SongReviewModal = ({ song, onClose, onPermanentDelete }) => {
         month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
-    return (
+return (
         <motion.div 
             className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
@@ -49,9 +49,11 @@ const SongReviewModal = ({ song, onClose, onPermanentDelete }) => {
 
                 {/* Song Player Embed */}
                 <div className="w-full mb-4">
+                    {/* Using the standard embed URL to display the archived song */}
                     <iframe
                         style={{borderRadius: '12px'}}
-                        src={`http://googleusercontent.com/spotify.com/embed/track/${song.spotifyId}?utm_source=generator&theme=0`}
+                        // NOTE: Uses the song.spotifyId to embed the player
+                        src={`https://open.spotify.com/embed/track/${song.spotifyId}?utm_source=generator&theme=0`}
                         width="100%"
                         height="152"
                         frameBorder="0"
@@ -66,21 +68,30 @@ const SongReviewModal = ({ song, onClose, onPermanentDelete }) => {
                     <Disc size={16} className="mr-1 text-purple-500"/> {song.artist}
                 </p>
                 
-                <p className="text-sm text-gray-500">
-                    Added by: <span className="font-semibold text-pink-600">{song.addedBy}</span>
-                </p>
                 <p className="text-sm text-gray-400 mb-4">
                     Archived on: {formatDate(song.deletedAt)}
                 </p>
                 
-                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    {/* RESTORE BUTTON IN MODAL */}
+                    <motion.button
+                        // Passes the MongoDB ID for restoration
+                        onClick={() => onRestore(song._id)} 
+                        className="px-4 py-2 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <RotateCcw size={16} className="inline mr-1"/> Restore
+                    </motion.button>
+                    
+                    {/* PERMANENT DELETE BUTTON IN MODAL */}
                     <motion.button
                         onClick={() => onPermanentDelete(song._id)}
                         className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <Trash2 size={16} className="inline mr-1"/> Yes, Permanently Delete
+                        <Trash2 size={16} className="inline mr-1"/> Permanently Delete
                     </motion.button>
                 </div>
             </motion.div>
@@ -129,6 +140,28 @@ const ViewDeletedSongs = () => {
             console.error("Permanent Delete Error:", err);
             const errorMessage = err.response?.data?.message || "Failed to permanently delete song.";
             toast(`Error: ${errorMessage}`);
+        }
+    };
+
+    // --- 🚨 CORRECTED RESTORE HANDLER 🚨 ---
+    const handleRestore = async (id) => {
+        try {
+            // 1. Send POST request to the restore endpoint
+            await API.post(`/our-songs/restore/${id}`); 
+            
+            // 2. Remove the song from the deleted list state immediately
+            setDeletedSongs(deletedSongs.filter(song => song._id !== id));
+            
+            // 3. Close the modal
+            setSelectedSong(null); 
+            
+            // 4. Navigate the user back to the active view page
+            alert("Song successfully restored! Redirecting to your active playlist...");
+            navigate('/our-songs/viewsongs'); 
+
+        } catch (err) {
+            console.error("Restore Error:", err);
+            alert(`Error: Failed to restore song. Check database and model integrity.`);
         }
     };
 
@@ -231,13 +264,14 @@ const ViewDeletedSongs = () => {
             {/* Content Rendering */}
             {renderContent()}
 
-            {/* --- RENDER THE MODAL --- */}
+           {/* --- RENDER THE MODAL --- */}
             <AnimatePresence>
                 {selectedSong && (
                     <SongReviewModal
                         song={selectedSong}
                         onClose={() => setSelectedSong(null)}
                         onPermanentDelete={handlePermanentDelete}
+                        onRestore={handleRestore}
                     />
                 )}
             </AnimatePresence>

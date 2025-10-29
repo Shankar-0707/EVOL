@@ -177,4 +177,38 @@ const permanentlyDeleteSong = async (req, res) => {
     }
 };
 
-export { searchSpotify, addSong, viewSongs, deleteSong, viewDeletedSongs, permanentlyDeleteSong };
+
+// --- NEW CONTROLLER: RESTORE SONG (POST) ---
+const restoreSong = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedSongModel
+        
+        // 1. Find the deleted song entry
+        const deletedSongEntry = await DeletedSongModel.findById(id);
+
+        if (!deletedSongEntry) {
+            return res.status(404).json({ message: "Song not found in archive." });
+        }
+        
+        // 2. Create the restored song in the active collection, using original data
+        await SongModel.create({
+            title: deletedSongEntry.title,
+            artist: deletedSongEntry.artist,
+            spotifyId: deletedSongEntry.spotifyId,
+            imageUrl: deletedSongEntry.imageUrl,
+            addedBy: deletedSongEntry.addedBy,
+            addedAt: deletedSongEntry.addedAt, // Preserve original date
+        });
+
+        // 3. Permanently delete the entry from the archive model
+        await DeletedSongModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Song restored to active playlist!" });
+
+    } catch (error) {
+        console.error("Restore Song Error:", error.message);
+        res.status(500).json({ message: "Server error during song restoration." });
+    }
+};
+
+export { searchSpotify, addSong, viewSongs, deleteSong, viewDeletedSongs, permanentlyDeleteSong, restoreSong };

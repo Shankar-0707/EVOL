@@ -17,14 +17,14 @@ import API from "../utils/api";
 import toast from "react-hot-toast";
 // const BASE_API_URL = 'http://localhost:5000/daily-notes';
 
- const formatDate = (dateString) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+const formatDate = (dateString) =>
+  new Date(dateString).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
 // --- MODAL COMPONENT ---
 const NoteReviewModal = ({ note, onClose, onPermanentDelete }) => {
@@ -35,8 +35,6 @@ const NoteReviewModal = ({ note, onClose, onPermanentDelete }) => {
     visible: { opacity: 1, y: 0, scale: 1 },
     exit: { opacity: 0, y: 50, scale: 0.8 },
   };
-
- 
 
   return (
     <motion.div
@@ -121,6 +119,32 @@ const ViewDeletedNotes = () => {
       setDeletedNotes([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // --- NEW RESTORE HANDLER ---
+  const handleRestore = async (id) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to RESTORE this note to the active list?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      // POST request to the new restore endpoint
+      await API.post(`/daily-notes/restore/${id}`);
+
+      // Remove from the deleted list state immediately
+      setDeletedNotes(deletedNotes.filter((note) => note._id !== id));
+
+      toast("Note successfully restored! Check your active notes page.");
+    } catch (err) {
+      console.error("Restore Error:", err);
+      const errorMessage =
+        err.response?.data?.message || "Failed to restore note.";
+      toast(`Error: ${errorMessage}`);
     }
   };
 
@@ -217,6 +241,34 @@ const ViewDeletedNotes = () => {
                   className="text-gray-500 flex-shrink-0"
                 />
               </div>
+
+              {/* --- NEW BUTTONS BAR --- */}
+              <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRestore(note._id);
+                  }}
+                  className="px-3 py-1 bg-green-600 text-white font-medium rounded-full hover:bg-green-700 transition duration-150"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <RotateCcw size={16} className="inline mr-1" /> Restore
+                </motion.button>
+
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedNote(note);
+                  }} // Open modal
+                  className="text-red-500 p-2 rounded-full hover:bg-red-100 transition duration-150"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Trash2 size={20} />
+                </motion.button>
+              </div>
+              {/* ------------------------- */}
             </motion.div>
           ))}
         </div>
@@ -246,16 +298,16 @@ const ViewDeletedNotes = () => {
           </motion.button>
 
           {/* ✅ NEW BUTTON — Generate New Note */}
-    <motion.button
-      onClick={() => navigate("/daily-notes")}
-      className="flex items-center px-4 py-2 bg-green-500 text-white rounded-full font-medium hover:bg-green-600 transition duration-150 shadow-md"
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      disabled={isLoading}
-    >
-      <MessageSquare size={20} className="mr-1" />
-      Generate New
-    </motion.button>
+          <motion.button
+            onClick={() => navigate("/daily-notes")}
+            className="flex items-center px-4 py-2 bg-green-500 text-white rounded-full font-medium hover:bg-green-600 transition duration-150 shadow-md"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            disabled={isLoading}
+          >
+            <MessageSquare size={20} className="mr-1" />
+            Generate New
+          </motion.button>
 
           {/* Back to Active Notes Button */}
           <motion.button
@@ -268,8 +320,6 @@ const ViewDeletedNotes = () => {
             <BookOpen size={20} className="mr-1" />
             Active Notes
           </motion.button>
-
-
         </div>
       </header>
 

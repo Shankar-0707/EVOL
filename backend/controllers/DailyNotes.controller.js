@@ -112,4 +112,37 @@ const permanentlyDeleteNote = async (req, res) => {
     }
 };
 
-export { add , view, deleteNote, viewDeletedNotes, permanentlyDeleteNote } 
+
+// --- NEW CONTROLLER: RESTORE NOTE (POST) ---
+const restoreNote = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedNoteModel
+        
+        // 1. Find the deleted note entry
+        const deletedNoteEntry = await DeletedNoteModel.findById(id);
+
+        if (!deletedNoteEntry) {
+            return res.status(404).json({ message: "Note not found in archive." });
+        }
+        
+        // 2. Create the restored note in the active collection, using original data
+        await DailyNoteModel.create({
+            // Use the data from the archive entry
+            title: deletedNoteEntry.title,
+            content: deletedNoteEntry.content,
+            madeby: deletedNoteEntry.madeby,
+            createdAt: deletedNoteEntry.createdAt, // Preserve original creation date
+        });
+
+        // 3. Permanently delete the entry from the archive model
+        await DeletedNoteModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Note restored to active list!" });
+
+    } catch (error) {
+        console.error("Restore Note Error:", error.message);
+        res.status(500).json({ message: "Server error during note restoration." });
+    }
+};
+
+export { add , view, deleteNote, viewDeletedNotes, permanentlyDeleteNote, restoreNote } 

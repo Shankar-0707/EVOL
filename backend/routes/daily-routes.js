@@ -1,5 +1,5 @@
 import express from "express";
-import { add, view , deleteNote, viewDeletedNotes, permanentlyDeleteNote} from "../controllers/DailyNotes.controller.js";
+import { add, view , deleteNote, viewDeletedNotes, permanentlyDeleteNote, restoreNote} from "../controllers/DailyNotes.controller.js";
 const router = express.Router();
 
 
@@ -9,5 +9,8 @@ router.get('/view', view)
 router.delete('/delete/:id', deleteNote);
 router.get("/view-all-deleted-notes", viewDeletedNotes); 
 router.delete("/permanently-delete/:id", permanentlyDeleteNote);
+
+// --- NEW RESTORE ROUTE ---
+router.post("/restore/:id", restoreNote);
 
 export default router;
