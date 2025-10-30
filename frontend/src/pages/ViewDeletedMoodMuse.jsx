@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 // const BASE_API_URL = 'http://localhost:5000/mood-muse';
 
 // --- MODAL COMPONENT ---
-const MuseReviewModal = ({ entry, onClose, onPermanentDelete }) => {
+const MuseReviewModal = ({ entry, onClose, onPermanentDelete, onRestore }) => { // <-- ADD onRestore
     if (!entry) return null;
     
     const modalVariants = {
@@ -61,14 +61,25 @@ const MuseReviewModal = ({ entry, onClose, onPermanentDelete }) => {
                     Archived on: {formatDate(entry.deletedAt)}
                 </p>
                 
-                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    {/* RESTORE BUTTON IN MODAL */}
+                    <motion.button
+                        onClick={() => onRestore(entry._id)}
+                        className="px-4 py-2 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <RotateCcw size={16} className="inline mr-1"/> Restore
+                    </motion.button>
+                    
+                    {/* PERMANENT DELETE BUTTON IN MODAL */}
                     <motion.button
                         onClick={() => onPermanentDelete(entry._id)}
                         className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <Trash2 size={16} className="inline mr-1"/> Yes, Permanently Delete
+                        <Trash2 size={16} className="inline mr-1"/> Permanently Delete
                     </motion.button>
                 </div>
             </motion.div>
@@ -117,6 +128,26 @@ const ViewDeletedMoodMuse = () => {
             console.error("Permanent Delete Error:", err);
             const errorMessage = err.response?.data?.message || "Failed to permanently delete entry.";
             toast(`Error: ${errorMessage}`);
+        }
+    };
+
+
+    // --- 🚨 NEW RESTORE HANDLER 🚨 ---
+    const handleRestore = async (id) => {
+        try {
+            await API.post(`/mood-muse/restore/${id}`); 
+            
+            // Remove the entry from the deleted list state immediately
+            setDeletedEntries(deletedEntries.filter(entry => entry._id !== id));
+            
+            setSelectedEntry(null); // Close the modal
+            
+            toast.success("Entry successfully restored! Redirecting to the Active Muse page...");
+            navigate('/mood-muse/view'); // Navigate back to the active list
+
+        } catch (err) {
+            console.error("Restore Error:", err);
+            toast.error(`Error: Failed to restore entry. Check database and model integrity.`);
         }
     };
 
@@ -239,6 +270,7 @@ const ViewDeletedMoodMuse = () => {
                         entry={selectedEntry}
                         onClose={() => setSelectedEntry(null)}
                         onPermanentDelete={handlePermanentDelete}
+                        onRestore={handleRestore}
                     />
                 )}
             </AnimatePresence>

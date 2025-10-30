@@ -17,92 +17,92 @@ import toast from "react-hot-toast";
 
 // const BASE_API_URL = 'http://localhost:5000/couple-comics';
 
-const DeleteConfirmationModal = ({ comic, onClose, onPermanentDelete }) => {
-  // Only render the modal if a comic object is passed
-  if (!comic) return null;
+// --- MODAL COMPONENT ---
+const DeleteConfirmationModal = ({ comic, onClose, onPermanentDelete, onRestore }) => { // <-- ADD onRestore
+    if (!comic) return null;
+    
+    const modalVariants = {
+        hidden: { opacity: 0, y: -50, scale: 0.8 },
+        visible: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: 50, scale: 0.8 },
+    };
 
-  // Framer Motion variants for the modal container
-  const modalVariants = {
-    hidden: { opacity: 0, y: -50, scale: 0.8 },
-    visible: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 50, scale: 0.8 },
-  };
+    const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
 
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose} // Close when clicking the overlay
-    >
-      <motion.div
-        className="bg-white p-6 rounded-2xl shadow-2xl max-w-3xl w-full"
-        variants={modalVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-      >
-        <div className="flex justify-between items-center mb-4 pb-2 border-b">
-          <h3 className="text-2xl font-extrabold text-red-600">
-            Review Deleted Comic
-          </h3>
-          <motion.button
+    return (
+        <motion.div 
+            className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-800 transition"
-            whileHover={{ rotate: 90 }}
-          >
-            <XCircle size={24} />
-          </motion.button>
-        </div>
-
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          {comic.comicTitle}
-        </h2>
-
-        {/* Comic Panel Grid Display */}
-        <div className="grid grid-cols-2 gap-4 border p-3 rounded-lg bg-gray-50 max-h-96 overflow-y-auto">
-          {comic.panels.map((panel, panelIndex) => (
+        >
             <motion.div
-              key={panelIndex}
-              className="border border-red-300 rounded-lg p-3 bg-red-50"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: panelIndex * 0.1 }}
+                className="bg-white p-6 rounded-2xl shadow-2xl max-w-3xl w-full"
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                onClick={(e) => e.stopPropagation()}
             >
-              <p className="text-xs font-bold text-red-500 mb-1">
-                PANEL {panel.panelNumber}
-              </p>
-              <p className="text-xs italic text-gray-600 mb-2">
-                Setting: {panel.setting}
-              </p>
-              <p className="text-base font-semibold text-gray-800">
-                "{panel.dialogue}"
-              </p>
+                <div className="flex justify-between items-center mb-4 pb-2 border-b">
+                    <h3 className="text-2xl font-extrabold text-red-600">Review Deleted Comic</h3>
+                    <motion.button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition" whileHover={{ rotate: 90 }}>
+                        <XCircle size={24} />
+                    </motion.button>
+                </div>
+
+                <h2 className="text-xl font-bold text-gray-800 mb-4">{comic.comicTitle}</h2>
+                
+                {/* Comic Panel Grid Display */}
+                <div className="grid grid-cols-2 gap-4 border p-3 rounded-lg bg-gray-50 max-h-96 overflow-y-auto">
+                    {comic.panels.map((panel, panelIndex) => (
+                        <motion.div
+                            key={panelIndex}
+                            className="border border-red-300 rounded-lg p-3 bg-red-50"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: panelIndex * 0.1 }}
+                        >
+                            <p className="text-xs font-bold text-red-500 mb-1">PANEL {panel.panelNumber}</p>
+                            <p className="text-xs italic text-gray-600 mb-2">Setting: {panel.setting}</p>
+                            <p className="text-base font-semibold text-gray-800">"{panel.dialogue}"</p>
+                        </motion.div>
+                    ))}
+                </div>
+                
+                <p className="text-sm text-gray-400 mt-4">
+                    Archived on: {formatDate(comic.deletedAt)}
+                </p>
+
+                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    
+                    {/* RESTORE BUTTON IN MODAL */}
+                    <motion.button
+                        onClick={() => onRestore(comic._id)}
+                        className="px-4 py-2 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <RotateCcw size={16} className="inline mr-1"/> Restore
+                    </motion.button>
+                    
+                    {/* PERMANENT DELETE BUTTON IN MODAL */}
+                    <motion.button
+                        onClick={() => onPermanentDelete(comic._id)}
+                        className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <Trash2 size={16} className="inline mr-1"/> Permanently Delete
+                    </motion.button>
+                </div>
             </motion.div>
-          ))}
-        </div>
-
-        <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
-          <p className="text-sm text-gray-500">
-            Archived on: {new Date(comic.deletedAt).toLocaleDateString()}
-          </p>
-          <motion.button
-            // Pass the function to the main component's permanent delete handler
-            onClick={() => onPermanentDelete(comic._id)}
-            className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Trash2 size={16} className="inline mr-1" /> Yes, Permanently Delete
-          </motion.button>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
+        </motion.div>
+    );
 };
-
 const ViewDeletedComics = () => {
   const navigate = useNavigate();
 
@@ -158,6 +158,27 @@ const ViewDeletedComics = () => {
       toast(`Error: ${errorMessage}`);
     }
   };
+
+  // --- 🚨 CORRECTED RESTORE HANDLER 🚨 ---
+    const handleRestore = async (id) => {
+        try {
+            await API.post(`/couple-comics/restore/${id}`); 
+            
+            // 2. Remove the comic from the deleted list state immediately
+            setDeletedComics(deletedComics.filter(comic => comic._id !== id));
+            
+            // 3. Close the modal
+            setSelectedComic(null); 
+            
+            // 4. Navigate the user back to the active view page
+            alert("Comic successfully restored! Redirecting to the Active Comics page...");
+            navigate('/couple-comics/view'); 
+
+        } catch (err) {
+            console.error("Restore Error:", err);
+            alert(`Error: Failed to restore comic. Check database and model integrity.`);
+        }
+    };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -305,6 +326,7 @@ const ViewDeletedComics = () => {
             comic={selectedComic}
             onClose={() => setSelectedComic(null)}
             onPermanentDelete={handlePermanentDelete}
+            onRestore={handleRestore}
           />
         )}
       </AnimatePresence>

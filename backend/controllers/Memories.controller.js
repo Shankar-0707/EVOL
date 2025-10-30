@@ -102,5 +102,37 @@ const permanentlyDeleteMemory = async (req, res) => {
     }
 };
 
+// --- NEW CONTROLLER: RESTORE MEMORY (POST) ---
+const restoreMemory = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedMemoryModel
+        
+        // 1. Find the deleted memory entry
+        const deletedMemoryEntry = await DeletedMemoryModel.findById(id);
 
-export { addMemory, viewMemories, deleteMemory, viewDeletedMemories, permanentlyDeleteMemory };
+        if (!deletedMemoryEntry) {
+            return res.status(404).json({ message: "Memory not found in archive." });
+        }
+        
+        // 2. Create the restored memory in the active collection, using original data
+        await MemoryModel.create({
+            title: deletedMemoryEntry.title,
+            description: deletedMemoryEntry.description,
+            date: deletedMemoryEntry.date,
+            addedBy: deletedMemoryEntry.addedBy,
+            createdAt: deletedMemoryEntry.createdAt, // Preserve original creation date
+        });
+
+        // 3. Permanently delete the entry from the archive model
+        await DeletedMemoryModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Memory restored to active list!" });
+
+    } catch (error) {
+        console.error("Restore Memory Error:", error.message);
+        res.status(500).json({ message: "Server error during memory restoration." });
+    }
+};
+
+
+export { addMemory, viewMemories, deleteMemory, viewDeletedMemories, permanentlyDeleteMemory, restoreMemory };

@@ -126,105 +126,85 @@ import toast from "react-hot-toast";
 //   );
 // };
 
-const QuizReviewModal = ({ quiz, onClose, onPermanentDelete }) => {
-  if (!quiz) return null;
-
-  const modalVariants = {
-    hidden: { opacity: 0, y: -50, scale: 0.8 },
-    visible: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 50, scale: 0.8 },
-  };
-
-  const formatDate = (dateString) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
+// --- MODAL COMPONENT ---
+// NOTE: This modal assumes the QUIZ MODEL stores questions as simple text/answer fields.
+const QuizReviewModal = ({ quiz, onClose, onPermanentDelete, onRestore }) => { // <-- ADD onRestore
+    if (!quiz) return null;
+    
+    const modalVariants = {
+        hidden: { opacity: 0, y: -50, scale: 0.8 },
+        visible: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: 50, scale: 0.8 },
+    };
+    
+    const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric'
     });
 
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-    >
-      <motion.div
-        className="bg-white p-6 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        variants={modalVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
-          <h3 className="text-2xl font-extrabold text-cyan-600">
-            Review Deleted Quiz
-          </h3>
-          <motion.button
+    return (
+        <motion.div 
+            className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-800 transition"
-            whileHover={{ rotate: 90 }}
-          >
-            <XCircle size={24} />
-          </motion.button>
-        </div>
+        >
+            <motion.div
+                className="bg-white p-6 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
+                    <h3 className="text-2xl font-extrabold text-cyan-600">Review Deleted Quiz Question</h3>
+                    <motion.button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition" whileHover={{ rotate: 90 }}>
+                        <XCircle size={24} />
+                    </motion.button>
+                </div>
 
-        {/* Question Content */}
-        <div className="bg-cyan-50 border border-cyan-100 rounded-xl p-4 shadow-inner">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
-            {quiz.category || "Untitled Category"}
-          </h2>
+                <div className="mb-4 p-4 rounded-lg border border-purple-200 bg-purple-50">
+                    <p className="text-sm font-semibold text-purple-700 mb-2">Category: {quiz.category}</p>
+                    <h2 className="text-xl font-bold text-gray-800">
+                        <HelpCircle size={20} className="inline mr-2 text-purple-500"/>{quiz.question}
+                    </h2>
+                </div>
+                
+                {/* Correct Answer Display */}
+                <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                    <p className="text-sm font-bold text-green-700 mb-1">Stored Correct Answer:</p>
+                    <p className="text-base text-green-900 font-medium">"{quiz.correctAnswer}"</p>
+                </div>
 
-          <p className="text-gray-700 mb-3 font-medium">
-            {quiz.question || "No question text available."}
-          </p>
-
-          <ul className="text-sm space-y-2">
-            {(quiz.options || []).map((option, index) => {
-              const optionLabel = String.fromCharCode(65 + index); // A, B, C...
-              const isCorrect =
-                quiz.correctAnswer?.toLowerCase() === optionLabel.toLowerCase();
-
-              return (
-                <li
-                  key={index}
-                  className={`p-2 rounded ${
-                    isCorrect
-                      ? "bg-green-100 text-green-700 font-semibold"
-                      : "bg-white text-gray-700"
-                  }`}
-                >
-                  {optionLabel}. {option}{" "}
-                  {isCorrect && (
-                    <span className="text-xs ml-1">(Correct Answer)</span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-
-          <p className="text-sm text-gray-400 mt-4">
-            Archived on: {formatDate(quiz.deletedAt)}
-          </p>
-        </div>
-
-        {/* Delete Button */}
-        <div className="mt-5 flex justify-end">
-          <motion.button
-            onClick={() => onPermanentDelete(quiz._id)}
-            className="px-4 py-2 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Trash2 size={16} className="inline mr-1" /> Permanently Delete
-          </motion.button>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
+                <p className="text-sm text-gray-400 mt-4">
+                    Archived on: {formatDate(quiz.deletedAt)}
+                </p>
+                
+                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    {/* RESTORE BUTTON IN MODAL */}
+                    <motion.button
+                        onClick={() => onRestore(quiz._id)}
+                        className="px-4 py-2 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <RotateCcw size={16} className="inline mr-1"/> Restore
+                    </motion.button>
+                    
+                    {/* PERMANENT DELETE BUTTON IN MODAL */}
+                    <motion.button
+                        onClick={() => onPermanentDelete(quiz._id)}
+                        className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <Trash2 size={16} className="inline mr-1"/> Permanently Delete
+                    </motion.button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
 };
 
 // --- MAIN COMPONENT ---
@@ -257,6 +237,28 @@ const ViewDeletedQuizzes = () => {
   useEffect(() => {
     fetchDeletedQuizzes();
   }, []);
+
+  // --- 🚨 CORRECTED RESTORE HANDLER 🚨 ---
+    const handleRestore = async (id) => {
+        try {
+            // 1. Send POST request to the restore endpoint
+            await API.post(`/couple-quiz/restore/${id}`); 
+            
+            // 2. Remove the question from the deleted list state immediately
+            setDeletedQuizzes(deletedQuizzes.filter(quiz => quiz._id !== id));
+            
+            // 3. Close the modal
+            setSelectedQuiz(null); 
+            
+            // 4. Navigate the user back to the active view page
+            toast.success("Question successfully restored! Redirecting to the Active Quiz page...");
+            navigate('/couple-quiz/view'); 
+
+        } catch (err) {
+            console.error("Restore Error:", err);
+            toast.error(`Error: Failed to restore question. Check database and model integrity.`);
+        }
+    };
 
   // --- PERMANENT DELETE FUNCTION ---
   const handlePermanentDelete = async (id) => {
@@ -387,6 +389,7 @@ const ViewDeletedQuizzes = () => {
             quiz={selectedQuiz}
             onClose={() => setSelectedQuiz(null)}
             onPermanentDelete={handlePermanentDelete}
+            onRestore={handleRestore}
           />
         )}
       </AnimatePresence>

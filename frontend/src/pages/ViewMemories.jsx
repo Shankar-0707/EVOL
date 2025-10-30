@@ -253,7 +253,7 @@ const ViewMemories = () => {
           <div className="text-center py-16 text-gray-500 bg-white p-6 rounded-xl shadow-lg">
             <p className="text-lg">No shared memories yet! Let's make some.</p>
             <motion.button
-              onClick={() => navigate("/add-memories")}
+              onClick={() => navigate("/our-memories/add-memory")}
               className="mt-4 px-6 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

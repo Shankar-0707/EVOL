@@ -1,5 +1,5 @@
 import express from "express";
-import { generateQuestion, viewQuestions,saveAnsweredQuestion, deleteQuiz, viewDeletedQuizzes, permanentlyDeleteQuiz } from "../controllers/CoupleQuiz.controller.js";
+import { generateQuestion, viewQuestions,saveAnsweredQuestion, deleteQuiz, viewDeletedQuizzes, permanentlyDeleteQuiz, restoreQuestion } from "../controllers/CoupleQuiz.controller.js";
 const router = express.Router();
 
 // 1. POST Route for generating and saving a question
@@ -15,5 +15,8 @@ router.delete("/delete/:id", deleteQuiz);
 
 router.get("/view-all-deleted-quizzes", viewDeletedQuizzes); 
 router.delete("/permanently-delete/:id", permanentlyDeleteQuiz);
+
+// --- NEW RESTORE ROUTE ---
+router.post("/restore/:id", restoreQuestion);
 
 export default router;

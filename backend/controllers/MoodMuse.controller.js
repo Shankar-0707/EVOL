@@ -130,4 +130,35 @@ const permanentlyDeleteEntry = async (req, res) => {
     }
 };
 
-export { generateContent, viewEntries, deleteEntry, viewDeletedEntries, permanentlyDeleteEntry };
+// --- NEW CONTROLLER: RESTORE ENTRY (POST) ---
+const restoreEntry = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedMoodMuseModel
+        
+        // 1. Find the deleted entry
+        const deletedEntry = await DeletedMoodMuseModel.findById(id);
+
+        if (!deletedEntry) {
+            return res.status(404).json({ message: "Mood Muse entry not found in archive." });
+        }
+        
+        // 2. Create the restored entry in the active collection, using original data
+        await MoodMuseModel.create({
+            mood: deletedEntry.mood,
+            promptType: deletedEntry.promptType,
+            generatedContent: deletedEntry.generatedContent,
+            createdAt: deletedEntry.createdAt, // Preserve original creation date
+        });
+
+        // 3. Permanently delete the entry from the archive model
+        await DeletedMoodMuseModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Mood Muse entry restored to active list!" });
+
+    } catch (error) {
+        console.error("Restore Entry Error:", error.message);
+        res.status(500).json({ message: "Server error during Mood Muse restoration." });
+    }
+};
+
+export { generateContent, viewEntries, deleteEntry, viewDeletedEntries, permanentlyDeleteEntry, restoreEntry };

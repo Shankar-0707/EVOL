@@ -92,6 +92,16 @@ const MemoryReviewModal = ({ memory, onClose, onPermanentDelete }) => {
         </p>
 
         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+          {/* --- RESTORE BUTTON IN MODAL --- */}
+          <motion.button
+            onClick={() => onRestore(memory._id)} // Call restore handler
+            className="px-4 py-2 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <RotateCcw size={16} className="inline mr-1" /> Restore
+          </motion.button>
+
           <motion.button
             onClick={() => onPermanentDelete(memory._id)}
             className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
@@ -114,6 +124,36 @@ const ViewDeletedMemories = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMemory, setSelectedMemory] = useState(null);
+
+  // --- NEW RESTORE HANDLER ---
+  const handleRestore = async (id) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to RESTORE this memory to the active list?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await API.post(`/our-memories/restore/${id}`);
+
+      // Remove the restored item from the deleted list state immediately
+      setDeletedMemories(deletedMemories.filter((memory) => memory._id !== id));
+
+      setSelectedMemory(null); // Close the modal
+
+      toast.success(
+        "Memory successfully restored! Redirecting to active memories..."
+      );
+      navigate("/our-memories/view-memories"); // Navigate to the active view page
+    } catch (err) {
+      console.error("Restore Error:", err);
+      const errorMessage =
+        err.response?.data?.message || "Failed to restore memory.";
+      alert(`Error: ${errorMessage}`);
+    }
+  };
 
   // --- FETCH DELETED MEMORIES FUNCTION ---
   const fetchDeletedMemories = async () => {
@@ -232,6 +272,34 @@ const ViewDeletedMemories = () => {
                   </p>
                 </div>
                 <BookOpen size={28} className="text-gray-500 flex-shrink-0" />
+              </div>
+
+              {/* --- Restore Button on Card --- */}
+              <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRestore(memory._id);
+                  }} // Restore on card click
+                  className="px-3 py-1 bg-green-600 text-white font-medium rounded-full hover:bg-green-700 transition duration-150"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <RotateCcw size={16} className="inline mr-1" /> Restore
+                </motion.button>
+
+                {/* Delete button (Opens Modal) */}
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedMemory(memory);
+                  }}
+                  className="text-red-500 p-2 rounded-full hover:bg-red-100 transition duration-150"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Trash2 size={20} />
+                </motion.button>
               </div>
             </motion.div>
           ))}

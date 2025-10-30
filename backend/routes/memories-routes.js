@@ -1,5 +1,5 @@
 import express from "express";
-import { addMemory, viewMemories, deleteMemory, viewDeletedMemories, permanentlyDeleteMemory } from "../controllers/Memories.controller.js";
+import { addMemory, viewMemories, deleteMemory, viewDeletedMemories, permanentlyDeleteMemory, restoreMemory } from "../controllers/Memories.controller.js";
 const router = express.Router();
 
 
@@ -15,5 +15,8 @@ router.delete("/delete-memory/:id", deleteMemory);
 // --- NEW ARCHIVE ROUTES ---
 router.get("/view-all-deleted-memories", viewDeletedMemories); 
 router.delete("/permanently-delete/:id", permanentlyDeleteMemory);
+
+// --- NEW RESTORE ROUTE ---
+router.post("/restore/:id", restoreMemory);
 
 export default router;

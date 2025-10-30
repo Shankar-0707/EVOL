@@ -144,4 +144,36 @@ const permanentlyDeleteComic = async (req, res) => {
 };
 
 
-export { generateComic, viewComics, deleteComic, viewDeletedComics, permanentlyDeleteComic };
+// --- NEW CONTROLLER: RESTORE COMIC (POST) ---
+const restoreComic = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedComicModel
+        
+        // 1. Find the deleted comic entry
+        const deletedComicEntry = await DeletedComicModel.findById(id);
+
+        if (!deletedComicEntry) {
+            return res.status(404).json({ message: "Comic not found in archive." });
+        }
+        
+        // 2. Create the restored comic in the active collection, using original data
+        await CoupleComicModel.create({
+            theme: deletedComicEntry.theme,
+            comicTitle: deletedComicEntry.comicTitle,
+            panels: deletedComicEntry.panels,
+            createdAt: deletedComicEntry.createdAt, // Preserve original creation date
+        });
+
+        // 3. Permanently delete the entry from the archive model
+        await DeletedComicModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Comic restored to active list!" });
+
+    } catch (error) {
+        console.error("Restore Comic Error:", error.message);
+        res.status(500).json({ message: "Server error during comic restoration." });
+    }
+};
+
+
+export { generateComic, viewComics, deleteComic, viewDeletedComics, permanentlyDeleteComic, restoreComic };

@@ -141,4 +141,36 @@ const permanentlyDeletePhoto = async (req, res) => {
     }
 };
 
-export { uploadPhoto, viewPhotos, deletePhoto, viewDeletedPhotos, permanentlyDeletePhoto };
+// --- NEW CONTROLLER: RESTORE PHOTO (POST) ---
+const restorePhoto = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedGalleryModel
+        
+        // 1. Find the deleted photo entry
+        const deletedPhotoEntry = await DeletedGalleryModel.findById(id);
+
+        if (!deletedPhotoEntry) {
+            return res.status(404).json({ message: "Photo not found in archive." });
+        }
+        
+        // 2. Create the restored photo in the active collection, using original data (including Buffer)
+        await GalleryModel.create({
+            caption: deletedPhotoEntry.caption,
+            image: deletedPhotoEntry.image, 
+            contentType: deletedPhotoEntry.contentType,
+            uploadedBy: deletedPhotoEntry.uploadedBy,
+            uploadedAt: deletedPhotoEntry.uploadedAt, // Preserve original date
+        });
+
+        // 3. Permanently delete the entry from the archive model
+        await DeletedGalleryModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Photo restored to active gallery!" });
+
+    } catch (error) {
+        console.error("Restore Photo Error:", error.message);
+        res.status(500).json({ message: "Server error during photo restoration." });
+    }
+};
+
+export { uploadPhoto, viewPhotos, deletePhoto, viewDeletedPhotos, permanentlyDeletePhoto, restorePhoto };

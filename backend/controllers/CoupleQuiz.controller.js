@@ -165,6 +165,37 @@ const permanentlyDeleteQuiz = async (req, res) => {
   }
 };
 
+// --- NEW CONTROLLER: RESTORE QUESTION (POST) ---
+const restoreQuestion = async (req, res) => {
+    try {
+        const { id } = req.params; // ID from the DeletedQuizModel
+        
+        // 1. Find the deleted question entry
+        const deletedQuestionEntry = await DeletedQuizModel.findById(id);
+
+        if (!deletedQuestionEntry) {
+            return res.status(404).json({ message: "Quiz question not found in archive." });
+        }
+        
+        // 2. Create the restored question in the active collection, using original data
+        await CoupleQuizModel.create({
+            question: deletedQuestionEntry.question,
+            correctAnswer: deletedQuestionEntry.correctAnswer,
+            category: deletedQuestionEntry.category,
+            createdAt: deletedQuestionEntry.createdAt, // Preserve original creation date
+        });
+
+        // 3. Permanently delete the entry from the archive model
+        await DeletedQuizModel.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Quiz question restored to active list!" });
+
+    } catch (error) {
+        console.error("Restore Question Error:", error.message);
+        res.status(500).json({ message: "Server error during quiz restoration." });
+    }
+};
+
 export {
   generateQuestion,
   saveAnsweredQuestion,
@@ -172,4 +203,5 @@ export {
   deleteQuiz,
   viewDeletedQuizzes,
   permanentlyDeleteQuiz,
+  restoreQuestion
 };

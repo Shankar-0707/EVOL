@@ -19,89 +19,79 @@ import toast from "react-hot-toast";
 // const BASE_API_URL = 'http://localhost:5000/our-gallery';
 
 // --- MODAL COMPONENT ---
-const PhotoReviewModal = ({ photo, onClose, onPermanentDelete }) => {
-  if (!photo) return null;
-
-  const modalVariants = {
-    hidden: { opacity: 0, y: -50, scale: 0.8 },
-    visible: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 50, scale: 0.8 },
-  };
-
-  const formatDate = (dateString) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+const PhotoReviewModal = ({ photo, onClose, onPermanentDelete, onRestore }) => { // <-- ADD onRestore
+    if (!photo) return null;
+    
+    const modalVariants = {
+        hidden: { opacity: 0, y: -50, scale: 0.8 },
+        visible: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: 50, scale: 0.8 },
+    };
+    
+    const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-    >
-      <motion.div
-        className="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
-        variants={modalVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex justify-between items-center mb-4 pb-2 border-b">
-          <h3 className="text-2xl font-extrabold text-teal-600">
-            Review Deleted Photo
-          </h3>
-          <motion.button
+    return (
+        <motion.div 
+            className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-800 transition"
-            whileHover={{ rotate: 90 }}
-          >
-            <XCircle size={24} />
-          </motion.button>
-        </div>
+        >
+            <motion.div
+                className="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="flex justify-between items-center mb-4 pb-2 border-b">
+                    <h3 className="text-2xl font-extrabold text-teal-600">Review Deleted Photo</h3>
+                    <motion.button onClick={onClose} className="text-gray-500 hover:text-gray-800 transition" whileHover={{ rotate: 90 }}>
+                        <XCircle size={24} />
+                    </motion.button>
+                </div>
 
-        <div className="w-full h-80 rounded-xl overflow-hidden mb-4 border border-gray-200">
-          {/* Display the Base64 image URL */}
-          <img
-            src={photo.imageUrl}
-            alt={photo.caption}
-            className="w-full h-full object-cover"
-          />
-        </div>
+                <div className="w-full h-80 rounded-xl overflow-hidden mb-4 border border-gray-200">
+                    <img src={photo.imageUrl} alt={photo.caption} className="w-full h-full object-cover" />
+                </div>
+                
+                <h2 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">{photo.caption}</h2>
+                
+                <p className="text-sm text-gray-500">
+                    Original Uploader: <span className="font-semibold text-teal-600">{photo.uploadedBy}</span>
+                </p>
+                <p className="text-sm text-gray-400 mb-4">
+                    Archived on: {formatDate(photo.deletedAt)}
+                </p>
+                
+                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    {/* RESTORE BUTTON IN MODAL */}
+                    <motion.button
+                        onClick={() => onRestore(photo._id)}
+                        className="px-4 py-2 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <RotateCcw size={16} className="inline mr-1"/> Restore
+                    </motion.button>
 
-        <h2 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
-          {photo.caption}
-        </h2>
-
-        <p className="text-sm text-gray-500">
-          Original Uploader:{" "}
-          <span className="font-semibold text-teal-600">
-            {photo.uploadedBy}
-          </span>
-        </p>
-        <p className="text-sm text-gray-400 mb-4">
-          Archived on: {formatDate(photo.deletedAt)}
-        </p>
-
-        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
-          <motion.button
-            onClick={() => onPermanentDelete(photo._id)}
-            className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Trash2 size={16} className="inline mr-1" /> Yes, Permanently Delete
-          </motion.button>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
+                    {/* PERMANENT DELETE BUTTON IN MODAL */}
+                    <motion.button
+                        onClick={() => onPermanentDelete(photo._id)}
+                        className="px-4 py-2 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <Trash2 size={16} className="inline mr-1"/> Permanently Delete
+                    </motion.button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
 };
 
 // --- MAIN COMPONENT ---
@@ -148,6 +138,28 @@ const ViewDeletedPhotos = () => {
       toast(`Error: ${errorMessage}`);
     }
   };
+
+  // --- 🚨 CORRECTED RESTORE HANDLER 🚨 ---
+    const handleRestore = async (id) => {
+        try {
+            // 1. Send POST request to the restore endpoint
+            await API.post(`/our-gallery/restore/${id}`); 
+            
+            // 2. Remove the photo from the deleted list state immediately
+            setDeletedPhotos(deletedPhotos.filter(photo => photo._id !== id));
+            
+            // 3. Close the modal
+            setSelectedPhoto(null); 
+            
+            // 4. Navigate the user back to the active view page
+            toast.success("Photo successfully restored! Redirecting to your active gallery...");
+            navigate('/our-gallery/view-gallery'); 
+
+        } catch (err) {
+            console.error("Restore Error:", err);
+            toast.error(`Error: Failed to restore photo. Check database and model integrity.`);
+        }
+    };
 
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleDateString("en-US", {
@@ -283,6 +295,7 @@ const ViewDeletedPhotos = () => {
             photo={selectedPhoto}
             onClose={() => setSelectedPhoto(null)}
             onPermanentDelete={handlePermanentDelete}
+            onRestore={handleRestore} 
           />
         )}
       </AnimatePresence>

@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadPhoto, viewPhotos, deletePhoto, viewDeletedPhotos, permanentlyDeletePhoto } from "../controllers/Gallery.controller.js";
+import { uploadPhoto, viewPhotos, deletePhoto, viewDeletedPhotos, permanentlyDeletePhoto, restorePhoto } from "../controllers/Gallery.controller.js";
 import upload from "../middlewares/multer.js";
 const router = express.Router();
 
@@ -18,5 +18,8 @@ router.delete("/delete-photo/:id", deletePhoto);
 // --- NEW ARCHIVE ROUTES ---
 router.get("/view-all-deleted-photos", viewDeletedPhotos); 
 router.delete("/permanently-delete/:id", permanentlyDeletePhoto);
+
+// --- NEW RESTORE ROUTE ---
+router.post("/restore/:id", restorePhoto);
 
 export default router;

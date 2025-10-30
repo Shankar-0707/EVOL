@@ -1,5 +1,5 @@
 import express from "express";
-import { generateComic, viewComics, deleteComic, viewDeletedComics, permanentlyDeleteComic } from "../controllers/CoupleComic.controller.js";
+import { generateComic, viewComics, deleteComic, viewDeletedComics, permanentlyDeleteComic, restoreComic } from "../controllers/CoupleComic.controller.js";
 const router = express.Router();
 
 // 1. POST Route for generating and saving the comic
@@ -16,5 +16,8 @@ router.get("/view-all-deleted-comics", viewDeletedComics);
 
 // DELETE route for permanent deletion (using the DeletedComicModel ID)
 router.delete("/permanently-delete/:id", permanentlyDeleteComic);
+
+// --- NEW RESTORE ROUTE ---
+router.post("/restore/:id", restoreComic);
 
 export default router;
